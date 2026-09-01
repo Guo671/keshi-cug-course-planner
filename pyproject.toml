@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cug-course-planner"
+version = "0.2.0"
+description = "中国地质大学（武汉）2026 秋季本地选课排课助手"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "alembic>=1.14,<2",
+  "argon2-cffi>=23.1,<26",
+  "fastapi>=0.115,<1",
+  "orjson>=3.10,<4",
+  "ortools>=9.12,<10",
+  "pydantic-settings>=2.7,<3",
+  "python-multipart>=0.0.18,<1",
+  "rapidfuzz>=3.10,<4",
+  "sqlalchemy>=2.0,<3",
+  "uvicorn[standard]>=0.34,<1",
+  "xlrd>=2.0.2,<3",
+]
+
+[project.scripts]
+cug-course-planner = "app.cli:main"
+
+[project.optional-dependencies]
+desktop = [
+  "pywebview>=6.2,<7",
+]
+build = [
+  "pillow==12.3.0",
+  "pyinstaller==6.22.2",
+]
+dev = [
+  "httpx>=0.28,<1",
+  "hypothesis>=6.120,<7",
+  "jsonschema>=4.23,<5",
+  "mypy>=1.14,<2",
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.25,<1",
+  "pytest-cov>=6,<7",
+  "ruff>=0.9,<1",
+]
+
+[tool.setuptools]
+package-dir = {"" = "backend"}
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+pythonpath = ["backend"]
+addopts = "-ra --strict-markers"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["app"]
+mypy_path = "backend"
+plugins = ["pydantic.mypy"]

@@ -1,0 +1,2309 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "name": "strategy_a_newest_snapshot_preferred",
+    "same_teaching_class": "Newest snapshot is selected; every source version remains attached for audit.",
+    "legacy_only": "Retained with needs_confirmation=true and reliable_for_scheduling=false; excluded unless include_old_only is explicitly enabled.",
+    "selected_count": "The source field is enrolled_count_snapshot, never capacity or availability."
+  },
+  "newest_snapshot": {
+    "snapshot_id": "2026-08-23",
+    "course_workbooks": 767,
+    "unique_course_codes": 767,
+    "teaching_classes": 1681,
+    "meetings": 4611,
+    "exact_meetings": 4366,
+    "week_only_meetings": 245,
+    "tbd_meetings": 0,
+    "reliable_teaching_classes": 1494,
+    "needs_confirmation": 187,
+    "non_null_capacity_fields": 0,
+    "enrolled_count_snapshot_fields": 1530,
+    "print_dates": [
+      "2026-08-23"
+    ],
+    "issue_counts": {
+      "non_numeric_practice_identity": 5,
+      "practice_time_unknown": 245,
+      "section_hyphen_missing": 5
+    }
+  },
+  "merge": {
+    "statistics": {
+      "new_only": 1304,
+      "new_preferred": 377,
+      "old_only": 92,
+      "structurally_changed": 3,
+      "enrollment_only_changed": 259,
+      "eligible_for_scheduling": 1494
+    },
+    "eligible_with_old_only_opt_in": 1586,
+    "old_only_teaching_classes": [
+      {
+        "course_code": "20739000",
+        "course_name": "测试技术",
+        "section_code": "0001",
+        "class_label": "测试技术-0001",
+        "class_composition": "072241;072242;072243",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "20739000-测试技术(20260812214805153).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "20739000",
+        "course_name": "测试技术",
+        "section_code": "0002",
+        "class_label": "测试技术-0002",
+        "class_composition": "072244;072245;072246",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "20739000-测试技术(20260812214805153).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "section_code": "0001",
+        "class_label": "极限飞盘-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60391-极限飞盘(20260812214022416).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "section_code": "0004",
+        "class_label": "极限飞盘-0004",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60391-极限飞盘(20260812214022416).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "section_code": "0002",
+        "class_label": "极限飞盘-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60391-极限飞盘(20260812214022416).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "section_code": "0005",
+        "class_label": "极限飞盘-0005",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60391-极限飞盘(20260812214022416).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "section_code": "0003",
+        "class_label": "极限飞盘-0003",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60391-极限飞盘(20260812214022416).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "section_code": "0006",
+        "class_label": "极限飞盘-0006",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60391-极限飞盘(20260812214022416).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "60481",
+        "course_name": "花样游泳",
+        "section_code": "0001",
+        "class_label": "花样游泳-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "60481-花样游泳(20260812214022400).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70100300",
+        "course_name": "地球科学概论",
+        "section_code": "0001",
+        "class_label": "地球科学概论-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70100300-地球科学概论(20260812214258271).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70100300",
+        "course_name": "地球科学概论",
+        "section_code": "0002",
+        "class_label": "地球科学概论-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70100300-地球科学概论(20260812214258271).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70100300",
+        "course_name": "地球科学概论",
+        "section_code": "0003",
+        "class_label": "地球科学概论-0003",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70100300-地球科学概论(20260812214258271).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70100300",
+        "course_name": "地球科学概论",
+        "section_code": "0004",
+        "class_label": "地球科学概论-0004",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70100300-地球科学概论(20260812214258271).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70100600",
+        "course_name": "生物地球化学",
+        "section_code": "0002",
+        "class_label": "生物地球化学-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70100600-生物地球化学(20260812214258465).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70200900",
+        "course_name": "地热资源概论",
+        "section_code": "0001",
+        "class_label": "地热资源概论-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70200900-地热资源概论(20260812214258376).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70201400",
+        "course_name": "石油勘探故事",
+        "section_code": "0001",
+        "class_label": "石油勘探故事-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70201400-石油勘探故事(20260812214258563).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0006",
+        "class_label": "生态学概论-0006",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0002",
+        "class_label": "生态学概论-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0007",
+        "class_label": "生态学概论-0007",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0003",
+        "class_label": "生态学概论-0003",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0004",
+        "class_label": "生态学概论-0004",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0008",
+        "class_label": "生态学概论-0008",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0005",
+        "class_label": "生态学概论-0005",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "section_code": "0001",
+        "class_label": "生态学概论-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70400600-生态学概论(20260812214258327).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70500300",
+        "course_name": "地质新能源“可燃冰”",
+        "section_code": "0001",
+        "class_label": "地质新能源“可燃冰”-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70500300-地质新能源“可燃冰”(20260812214258477).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70500800",
+        "course_name": "新能源科学应用概论",
+        "section_code": "0001",
+        "class_label": "新能源科学应用概论-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70500800-新能源科学应用概论(20260812214258626).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70701000",
+        "course_name": "简明数学史",
+        "section_code": "0001",
+        "class_label": "简明数学史-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70701000-简明数学史(20260812214258427).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70801700",
+        "course_name": "自然灾害与自然保护",
+        "section_code": "0001",
+        "class_label": "自然灾害与自然保护-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70801700-自然灾害与自然保护(20260812214258639).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70901200",
+        "course_name": "宜居地球：科幻文学作品导读",
+        "section_code": "0002",
+        "class_label": "宜居地球：科幻文学作品导读-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70901200-宜居地球：科幻文学作品导读(20260812214258506).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70901200",
+        "course_name": "宜居地球：科幻文学作品导读",
+        "section_code": "0001",
+        "class_label": "宜居地球：科幻文学作品导读-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70901200-宜居地球：科幻文学作品导读(20260812214258506).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70901200",
+        "course_name": "宜居地球：科幻文学作品导读",
+        "section_code": "0003",
+        "class_label": "宜居地球：科幻文学作品导读-0003",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70901200-宜居地球：科幻文学作品导读(20260812214258506).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "70948100",
+        "course_name": "法国语言文化入门",
+        "section_code": "0001",
+        "class_label": "法国语言文化入门-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "70948100-法国语言文化入门(20260812214258736).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71100600",
+        "course_name": "无人机技术与实践",
+        "section_code": "0001",
+        "class_label": "无人机技术与实践-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71100600-无人机技术与实践(20260812214258710).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71200200",
+        "course_name": "数学建模方法",
+        "section_code": "0001",
+        "class_label": "数学建模方法-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71200200-数学建模方法(20260812214258221).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71200400",
+        "course_name": "高等数学强化与提高",
+        "section_code": "0001",
+        "class_label": "高等数学强化与提高-0001（南望山）",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71200400-高等数学强化与提高(20260812214258404).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71200700",
+        "course_name": "数学竞赛选讲",
+        "section_code": "0001",
+        "class_label": "数学竞赛选讲-0001（数学专业）",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71200700-数学竞赛选讲(20260812214258547).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71301000",
+        "course_name": "登山常识",
+        "section_code": "0001",
+        "class_label": "登山常识-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71301000-登山常识(20260812214258523).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71301300",
+        "course_name": "野外生存",
+        "section_code": "0003",
+        "class_label": "野外生存-0003",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71301300-野外生存(20260812214258762).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71301300",
+        "course_name": "野外生存",
+        "section_code": "0002",
+        "class_label": "野外生存-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71301300-野外生存(20260812214258762).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71301300",
+        "course_name": "野外生存",
+        "section_code": "0004",
+        "class_label": "野外生存-0004",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71301300-野外生存(20260812214258762).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71400400",
+        "course_name": "宝玉石鉴赏",
+        "section_code": "0001",
+        "class_label": "宝玉石鉴赏-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71400400-宝玉石鉴赏(20260812214258723).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71600500",
+        "course_name": "乐理入门",
+        "section_code": "0001",
+        "class_label": "乐理入门-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71600500-乐理入门(20260812214258258).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71600500",
+        "course_name": "乐理入门",
+        "section_code": "0002",
+        "class_label": "乐理入门-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71600500-乐理入门(20260812214258258).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71602400",
+        "course_name": "歌曲写作与赏析",
+        "section_code": "0001",
+        "class_label": "歌曲写作与赏析-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71602400-歌曲写作与赏析(20260812214258347).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71602700",
+        "course_name": "中外建筑漫谈",
+        "section_code": "0001",
+        "class_label": "中外建筑漫谈-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71602700-中外建筑漫谈(20260812214258439).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71603100",
+        "course_name": "中国现当代小说鉴赏",
+        "section_code": "0001",
+        "class_label": "中国现当代小说鉴赏-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71603100-中国现当代小说鉴赏(20260812214258490).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71603100",
+        "course_name": "中国现当代小说鉴赏",
+        "section_code": "0002",
+        "class_label": "中国现当代小说鉴赏-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71603100-中国现当代小说鉴赏(20260812214258490).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "71800600",
+        "course_name": "国土安全",
+        "section_code": "0001",
+        "class_label": "国土安全-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "71800600-国土安全(20260812214258454).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "72400500",
+        "course_name": "海洋与人类",
+        "section_code": "0001",
+        "class_label": "海洋与人类-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "72400500-海洋与人类(20260812214258361).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "72400500",
+        "course_name": "海洋与人类",
+        "section_code": "0002",
+        "class_label": "海洋与人类-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "72400500-海洋与人类(20260812214258361).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "73700200",
+        "course_name": "大学生安全与生活",
+        "section_code": "0001A",
+        "class_label": "大学生安全与生活-0001A",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "73700200-大学生安全与生活(20260812214258389).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "73700200",
+        "course_name": "大学生安全与生活",
+        "section_code": "0002A",
+        "class_label": "大学生安全与生活-0002A",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "73700200-大学生安全与生活(20260812214258389).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "73700200",
+        "course_name": "大学生安全与生活",
+        "section_code": "0001",
+        "class_label": "大学生安全与生活-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "73700200-大学生安全与生活(20260812214258389).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "73700200",
+        "course_name": "大学生安全与生活",
+        "section_code": "0002",
+        "class_label": "大学生安全与生活-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "73700200-大学生安全与生活(20260812214258389).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "7390343x",
+        "course_name": "数字素养",
+        "section_code": "0001",
+        "class_label": "数字素养-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "7390343x-数字素养(20260812214258204).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "74200900",
+        "course_name": "儒家思想文化导论",
+        "section_code": "0001",
+        "class_label": "儒家思想文化导论-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "74200900-儒家思想文化导论(20260812214258535).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0013",
+        "class_label": "大学生就业指导-0013",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0011",
+        "class_label": "大学生就业指导-0011",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0007",
+        "class_label": "大学生就业指导-0007",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0004",
+        "class_label": "大学生就业指导-0004",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0006",
+        "class_label": "大学生就业指导-0006",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0008",
+        "class_label": "大学生就业指导-0008",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0005",
+        "class_label": "大学生就业指导-0005",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0002",
+        "class_label": "大学生就业指导-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0009",
+        "class_label": "大学生就业指导-0009",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "section_code": "0012",
+        "class_label": "大学生就业指导-0012",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0020",
+        "class_label": "生涯规划与职业发展-0020",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0017",
+        "class_label": "生涯规划与职业发展-0017",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0018",
+        "class_label": "生涯规划与职业发展-0018",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0021",
+        "class_label": "生涯规划与职业发展-0021",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0019",
+        "class_label": "生涯规划与职业发展-0019",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0006",
+        "class_label": "生涯规划与职业发展-0006",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0003",
+        "class_label": "生涯规划与职业发展-0003",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0008",
+        "class_label": "生涯规划与职业发展-0008",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0004",
+        "class_label": "生涯规划与职业发展-0004",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0015",
+        "class_label": "生涯规划与职业发展-0015",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0013",
+        "class_label": "生涯规划与职业发展-0013",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0001",
+        "class_label": "生涯规划与职业发展-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0010",
+        "class_label": "生涯规划与职业发展-0010",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0009",
+        "class_label": "生涯规划与职业发展-0009",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0005",
+        "class_label": "生涯规划与职业发展-0005",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0012",
+        "class_label": "生涯规划与职业发展-0012",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0007",
+        "class_label": "生涯规划与职业发展-0007",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0014",
+        "class_label": "生涯规划与职业发展-0014",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "section_code": "0016",
+        "class_label": "生涯规划与职业发展-0016",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "77200200",
+        "course_name": "大学生健康知识",
+        "section_code": "0001",
+        "class_label": "大学生健康知识-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "77200200-大学生健康知识(20260812214258245).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "znc00001",
+        "course_name": "日常生活中的德与法",
+        "section_code": "0001",
+        "class_label": "日常生活中的德与法-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "znc00001-日常生活中的德与法(20260812214258652).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "znc00002",
+        "course_name": "财政改革与大国兴衰",
+        "section_code": "0001",
+        "class_label": "财政改革与大国兴衰-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "znc00002-财政改革与大国兴衰(20260812214258665).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "znc00003",
+        "course_name": "以案说法",
+        "section_code": "0001",
+        "class_label": "以案说法-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "znc00003-以案说法(20260812214258678).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "znc00003",
+        "course_name": "以案说法",
+        "section_code": "0002",
+        "class_label": "以案说法-0002",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "znc00003-以案说法(20260812214258678).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "znc00007",
+        "course_name": "金融创新与金融法典型案例分析",
+        "section_code": "0001",
+        "class_label": "金融创新与金融法典型案例分析-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "znc00007-金融创新与金融法典型案例分析(20260812214258697).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      },
+      {
+        "course_code": "znc00010",
+        "course_name": "中国财税文化思想与制度",
+        "section_code": "0001",
+        "class_label": "中国财税文化思想与制度-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-12-to-13",
+        "source_name": "znc00010-中国财税文化思想与制度(20260812214258747).xls",
+        "enrolled_count_snapshot": 0,
+        "capacity": null,
+        "needs_confirmation": true,
+        "reliable_for_scheduling": false,
+        "eligible_by_default": false,
+        "eligible_with_explicit_opt_in": true
+      }
+    ],
+    "structurally_changed_teaching_classes": [
+      {
+        "course_code": "21212801",
+        "course_name": "线性代数A",
+        "section_code": "0008",
+        "class_label": "线性代数A-0008",
+        "class_composition": "060250;07G251;07G252",
+        "source_snapshot": "2026-08-23",
+        "source_name": "21212801-线性代数A(20260823221624902).xls",
+        "enrolled_count_snapshot": 96,
+        "capacity": null
+      },
+      {
+        "course_code": "71600700",
+        "course_name": "漫谈艺术史",
+        "section_code": "0001",
+        "class_label": "漫谈艺术史-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-23",
+        "source_name": "71600700-漫谈艺术史(20260823221626820).xls",
+        "enrolled_count_snapshot": 29,
+        "capacity": null
+      },
+      {
+        "course_code": "71801800",
+        "course_name": "大学生国家安全教育",
+        "section_code": "0001",
+        "class_label": "大学生国家安全教育-0001",
+        "class_composition": "无",
+        "source_snapshot": "2026-08-23",
+        "source_name": "71801800-大学生国家安全教育(20260823221634484).xls",
+        "enrolled_count_snapshot": 130,
+        "capacity": null
+      }
+    ]
+  },
+  "audit_findings": {
+    "duplicate_trimmed_course_names": {
+      "轮滑": [
+        "21301600",
+        "60071"
+      ],
+      "慢投垒球": [
+        "21307900",
+        "60241"
+      ],
+      "地貌学及第四纪地质学": [
+        "20101600",
+        "20115100"
+      ],
+      "环境科学导论": [
+        "20337026",
+        "20412700"
+      ],
+      "岩土工程监测": [
+        "20517400",
+        "20530200"
+      ],
+      "数控技术": [
+        "20727600",
+        "20746900"
+      ],
+      "线性代数A": [
+        "21212801",
+        "21225101"
+      ],
+      "生产实习": [
+        "40214900",
+        "40324500",
+        "40729400",
+        "41413300",
+        "42302500"
+      ],
+      "岩土工程勘察课程设计": [
+        "40529300",
+        "40558900"
+      ],
+      "毕业实习": [
+        "41637500",
+        "41720400",
+        "41723300"
+      ],
+      "深度学习": [
+        "21952400",
+        "21953300"
+      ],
+      "数值计算方法": [
+        "20742000",
+        "22408300"
+      ],
+      "人工智能原理与应用": [
+        "20235000",
+        "20630300"
+      ],
+      "水文地质学": [
+        "20445700",
+        "20451300"
+      ],
+      "机器学习": [
+        "20631400",
+        "20744100"
+      ],
+      "中国古玉器与玉文化": [
+        "21421200",
+        "21425300"
+      ]
+    },
+    "filename_course_names_with_trailing_space": 36,
+    "sanitized_filename_count": 1,
+    "sanitized_original_names": [
+      "22314120-传感器原理及检测技术II: 现代传感器技术(20260823221631859).xls"
+    ],
+    "course_section_codes_reused_across_compositions": 2
+  },
+  "legacy_snapshot": {
+    "snapshot_id": "2026-08-12-to-13",
+    "course_workbooks": 147,
+    "unique_course_codes": 147,
+    "teaching_classes": 469,
+    "meetings": 792,
+    "exact_meetings": 779,
+    "week_only_meetings": 13,
+    "tbd_meetings": 0,
+    "reliable_teaching_classes": 456,
+    "needs_confirmation": 13,
+    "non_null_capacity_fields": 0,
+    "enrolled_count_snapshot_fields": 461,
+    "print_dates": [
+      "2026-08-12",
+      "2026-08-13"
+    ],
+    "issue_counts": {
+      "practice_time_unknown": 13
+    }
+  },
+  "legacy_course_comparison": {
+    "counts": {
+      "absent_from_newest": 38,
+      "structurally_changed": 30,
+      "enrollment_only_changed": 71,
+      "unchanged": 8
+    },
+    "absent_from_newest": [
+      {
+        "course_code": "20739000",
+        "course_name": "测试技术",
+        "source_name": "20739000-测试技术(20260812214805153).xls"
+      },
+      {
+        "course_code": "60391",
+        "course_name": "极限飞盘",
+        "source_name": "60391-极限飞盘(20260812214022416).xls"
+      },
+      {
+        "course_code": "60481",
+        "course_name": "花样游泳",
+        "source_name": "60481-花样游泳(20260812214022400).xls"
+      },
+      {
+        "course_code": "70100300",
+        "course_name": "地球科学概论",
+        "source_name": "70100300-地球科学概论(20260812214258271).xls"
+      },
+      {
+        "course_code": "70100600",
+        "course_name": "生物地球化学",
+        "source_name": "70100600-生物地球化学(20260812214258465).xls"
+      },
+      {
+        "course_code": "70200900",
+        "course_name": "地热资源概论",
+        "source_name": "70200900-地热资源概论(20260812214258376).xls"
+      },
+      {
+        "course_code": "70201400",
+        "course_name": "石油勘探故事",
+        "source_name": "70201400-石油勘探故事(20260812214258563).xls"
+      },
+      {
+        "course_code": "70400600",
+        "course_name": "生态学概论",
+        "source_name": "70400600-生态学概论(20260812214258327).xls"
+      },
+      {
+        "course_code": "70500300",
+        "course_name": "地质新能源“可燃冰”",
+        "source_name": "70500300-地质新能源“可燃冰”(20260812214258477).xls"
+      },
+      {
+        "course_code": "70500800",
+        "course_name": "新能源科学应用概论",
+        "source_name": "70500800-新能源科学应用概论(20260812214258626).xls"
+      },
+      {
+        "course_code": "70701000",
+        "course_name": "简明数学史",
+        "source_name": "70701000-简明数学史(20260812214258427).xls"
+      },
+      {
+        "course_code": "70801700",
+        "course_name": "自然灾害与自然保护",
+        "source_name": "70801700-自然灾害与自然保护(20260812214258639).xls"
+      },
+      {
+        "course_code": "70901200",
+        "course_name": "宜居地球：科幻文学作品导读",
+        "source_name": "70901200-宜居地球：科幻文学作品导读(20260812214258506).xls"
+      },
+      {
+        "course_code": "70948100",
+        "course_name": "法国语言文化入门",
+        "source_name": "70948100-法国语言文化入门(20260812214258736).xls"
+      },
+      {
+        "course_code": "71100600",
+        "course_name": "无人机技术与实践",
+        "source_name": "71100600-无人机技术与实践(20260812214258710).xls"
+      },
+      {
+        "course_code": "71200200",
+        "course_name": "数学建模方法",
+        "source_name": "71200200-数学建模方法(20260812214258221).xls"
+      },
+      {
+        "course_code": "71200400",
+        "course_name": "高等数学强化与提高",
+        "source_name": "71200400-高等数学强化与提高(20260812214258404).xls"
+      },
+      {
+        "course_code": "71200700",
+        "course_name": "数学竞赛选讲",
+        "source_name": "71200700-数学竞赛选讲(20260812214258547).xls"
+      },
+      {
+        "course_code": "71301000",
+        "course_name": "登山常识",
+        "source_name": "71301000-登山常识(20260812214258523).xls"
+      },
+      {
+        "course_code": "71301300",
+        "course_name": "野外生存",
+        "source_name": "71301300-野外生存(20260812214258762).xls"
+      },
+      {
+        "course_code": "71400400",
+        "course_name": "宝玉石鉴赏",
+        "source_name": "71400400-宝玉石鉴赏(20260812214258723).xls"
+      },
+      {
+        "course_code": "71600500",
+        "course_name": "乐理入门",
+        "source_name": "71600500-乐理入门(20260812214258258).xls"
+      },
+      {
+        "course_code": "71602400",
+        "course_name": "歌曲写作与赏析",
+        "source_name": "71602400-歌曲写作与赏析(20260812214258347).xls"
+      },
+      {
+        "course_code": "71602700",
+        "course_name": "中外建筑漫谈",
+        "source_name": "71602700-中外建筑漫谈(20260812214258439).xls"
+      },
+      {
+        "course_code": "71603100",
+        "course_name": "中国现当代小说鉴赏",
+        "source_name": "71603100-中国现当代小说鉴赏(20260812214258490).xls"
+      },
+      {
+        "course_code": "71800600",
+        "course_name": "国土安全",
+        "source_name": "71800600-国土安全(20260812214258454).xls"
+      },
+      {
+        "course_code": "72400500",
+        "course_name": "海洋与人类",
+        "source_name": "72400500-海洋与人类(20260812214258361).xls"
+      },
+      {
+        "course_code": "73700200",
+        "course_name": "大学生安全与生活",
+        "source_name": "73700200-大学生安全与生活(20260812214258389).xls"
+      },
+      {
+        "course_code": "7390343x",
+        "course_name": "数字素养",
+        "source_name": "7390343x-数字素养(20260812214258204).xls"
+      },
+      {
+        "course_code": "74200900",
+        "course_name": "儒家思想文化导论",
+        "source_name": "74200900-儒家思想文化导论(20260812214258535).xls"
+      },
+      {
+        "course_code": "75100100",
+        "course_name": "大学生就业指导",
+        "source_name": "75100100-大学生就业指导(20260812214258577).xls"
+      },
+      {
+        "course_code": "75100200",
+        "course_name": "生涯规划与职业发展",
+        "source_name": "75100200-生涯规划与职业发展(20260812214258597).xls"
+      },
+      {
+        "course_code": "77200200",
+        "course_name": "大学生健康知识",
+        "source_name": "77200200-大学生健康知识(20260812214258245).xls"
+      },
+      {
+        "course_code": "znc00001",
+        "course_name": "日常生活中的德与法",
+        "source_name": "znc00001-日常生活中的德与法(20260812214258652).xls"
+      },
+      {
+        "course_code": "znc00002",
+        "course_name": "财政改革与大国兴衰",
+        "source_name": "znc00002-财政改革与大国兴衰(20260812214258665).xls"
+      },
+      {
+        "course_code": "znc00003",
+        "course_name": "以案说法",
+        "source_name": "znc00003-以案说法(20260812214258678).xls"
+      },
+      {
+        "course_code": "znc00007",
+        "course_name": "金融创新与金融法典型案例分析",
+        "source_name": "znc00007-金融创新与金融法典型案例分析(20260812214258697).xls"
+      },
+      {
+        "course_code": "znc00010",
+        "course_name": "中国财税文化思想与制度",
+        "source_name": "znc00010-中国财税文化思想与制度(20260812214258747).xls"
+      }
+    ],
+    "structurally_changed": [
+      {
+        "course_code": "60011",
+        "course_name": "健美操初级班",
+        "source_name": "60011-健美操初级班(20260812214021925).xls"
+      },
+      {
+        "course_code": "60051",
+        "course_name": "篮球初级班",
+        "source_name": "60051-篮球初级班(202608122140227).xls"
+      },
+      {
+        "course_code": "60101",
+        "course_name": "乒乓球初级班",
+        "source_name": "60101-乒乓球初级班(2026081221402269).xls"
+      },
+      {
+        "course_code": "60131",
+        "course_name": "网球初级班",
+        "source_name": "60131-网球初级班(20260812214022105).xls"
+      },
+      {
+        "course_code": "60181",
+        "course_name": "羽毛球初级班",
+        "source_name": "60181-羽毛球初级班(20260812214022162).xls"
+      },
+      {
+        "course_code": "60201",
+        "course_name": "足球初级班",
+        "source_name": "60201-足球初级班(20260812214022202).xls"
+      },
+      {
+        "course_code": "60351",
+        "course_name": "游泳",
+        "source_name": "60351-游泳(20260812214022299).xls"
+      },
+      {
+        "course_code": "60371",
+        "course_name": "体能训练",
+        "source_name": "60371-体能训练(20260812214022324).xls"
+      },
+      {
+        "course_code": "60451",
+        "course_name": "匹克球",
+        "source_name": "60451-匹克球(20260812214022355).xls"
+      },
+      {
+        "course_code": "21212801",
+        "course_name": "线性代数A",
+        "source_name": "21212801-线性代数A(20260813165626743).xls"
+      },
+      {
+        "course_code": "70802400",
+        "course_name": "旅游与身心健康",
+        "source_name": "70802400-旅游与身心健康(20260812214257898).xls"
+      },
+      {
+        "course_code": "7080590x",
+        "course_name": "旅游与旅游法",
+        "source_name": "7080590x-旅游与旅游法(20260812214257206).xls"
+      },
+      {
+        "course_code": "71100900",
+        "course_name": "北斗导航应用",
+        "source_name": "71100900-北斗导航应用(20260812214257788).xls"
+      },
+      {
+        "course_code": "71101000",
+        "course_name": "测绘认知与劳动实践",
+        "source_name": "71101000-测绘认知与劳动实践(20260812214257800).xls"
+      },
+      {
+        "course_code": "7130126x",
+        "course_name": "户外拓展训练",
+        "source_name": "7130126x-户外拓展训练(20260812214257277).xls"
+      },
+      {
+        "course_code": "7160011x",
+        "course_name": "合唱基础与技巧",
+        "source_name": "7160011x-合唱基础与技巧(20260812214257291).xls"
+      },
+      {
+        "course_code": "71600700",
+        "course_name": "漫谈艺术史",
+        "source_name": "71600700-漫谈艺术史(20260812214257305).xls"
+      },
+      {
+        "course_code": "71601600",
+        "course_name": "经典音乐剧赏析",
+        "source_name": "71601600-经典音乐剧赏析(20260812214257318).xls"
+      },
+      {
+        "course_code": "71601700",
+        "course_name": "影视音乐赏析",
+        "source_name": "71601700-影视音乐赏析(20260812214257332).xls"
+      },
+      {
+        "course_code": "71602000",
+        "course_name": "世界民族音乐鉴赏",
+        "source_name": "71602000-世界民族音乐鉴赏(20260812214257361).xls"
+      },
+      {
+        "course_code": "71603900",
+        "course_name": "古诗词遇见中国地理",
+        "source_name": "71603900-古诗词遇见中国地理(20260812214257765).xls"
+      },
+      {
+        "course_code": "71604200",
+        "course_name": "音乐与健康",
+        "source_name": "71604200-音乐与健康(20260812214257857).xls"
+      },
+      {
+        "course_code": "71604500",
+        "course_name": "音乐与科技",
+        "source_name": "71604500-音乐与科技(20260812214257926).xls"
+      },
+      {
+        "course_code": "71604700",
+        "course_name": "交响乐名作鉴赏",
+        "source_name": "71604700-交响乐名作鉴赏(20260812214257937).xls"
+      },
+      {
+        "course_code": "71604900",
+        "course_name": "画中说乐-讲给所有人的中国音乐史",
+        "source_name": "71604900-画中说乐-讲给所有人的中国音乐史(2026081221425832).xls"
+      },
+      {
+        "course_code": "71605200",
+        "course_name": "影视音乐艺术与作品赏析",
+        "source_name": "71605200-影视音乐艺术与作品赏析(20260812214258150).xls"
+      },
+      {
+        "course_code": "7160650x",
+        "course_name": "钢琴音乐作品赏析",
+        "source_name": "7160650x-钢琴音乐作品赏析(20260812214257378).xls"
+      },
+      {
+        "course_code": "71801800",
+        "course_name": "大学生国家安全教育",
+        "source_name": "71801800-大学生国家安全教育(20260812214258191).xls"
+      },
+      {
+        "course_code": "7200544x",
+        "course_name": "心理学与自我成长",
+        "source_name": "7200544x-心理学与自我成长(20260812214257439).xls"
+      },
+      {
+        "course_code": "75100300",
+        "course_name": "《孙子兵法》赏析与应用",
+        "source_name": "75100300-《孙子兵法》赏析与应用(20260812214257754).xls"
+      }
+    ],
+    "enrollment_only_changed": [
+      {
+        "course_code": "20519200",
+        "course_name": "钻探工程概论",
+        "source_name": "20519200-钻探工程概论(2026081221490047).xls"
+      },
+      {
+        "course_code": "20705300",
+        "course_name": "机电产品生产管理",
+        "source_name": "20705300-机电产品生产管理(20260812214918997).xls"
+      },
+      {
+        "course_code": "20706100",
+        "course_name": "机械工程控制基础",
+        "source_name": "20706100-机械工程控制基础(20260812214603871).xls"
+      },
+      {
+        "course_code": "20718200",
+        "course_name": "模具设计",
+        "source_name": "20718200-模具设计(20260812215026762).xls"
+      },
+      {
+        "course_code": "20727600",
+        "course_name": "数控技术",
+        "source_name": "20727600-数控技术(20260812214955242).xls"
+      },
+      {
+        "course_code": "20741900",
+        "course_name": "工程流体力学",
+        "source_name": "20741900-工程流体力学(20260812214656507).xls"
+      },
+      {
+        "course_code": "20742000",
+        "course_name": "数值计算方法",
+        "source_name": "20742000-数值计算方法 (20260812214722277).xls"
+      },
+      {
+        "course_code": "20742100",
+        "course_name": "互换性与测量技术",
+        "source_name": "20742100-互换性与测量技术 (20260812214748812).xls"
+      },
+      {
+        "course_code": "20742200",
+        "course_name": "机械设计",
+        "source_name": "20742200-机械设计(20260812215212541).xls"
+      },
+      {
+        "course_code": "20742300",
+        "course_name": "单片机原理及应用",
+        "source_name": "20742300-单片机原理及应用(20260812214825789).xls"
+      },
+      {
+        "course_code": "20742400",
+        "course_name": "机器人技术",
+        "source_name": "20742400-机器人技术(20260812214934711).xls"
+      },
+      {
+        "course_code": "60021",
+        "course_name": "交谊舞男生班",
+        "source_name": "60021-交谊舞男生班(20260812214021965).xls"
+      },
+      {
+        "course_code": "60031",
+        "course_name": "交谊舞女生班",
+        "source_name": "60031-交谊舞女生班(20260812214021979).xls"
+      },
+      {
+        "course_code": "60041",
+        "course_name": "康复保健",
+        "source_name": "60041-康复保健(20260812214021995).xls"
+      },
+      {
+        "course_code": "60071",
+        "course_name": "轮滑",
+        "source_name": "60071-轮滑(2026081221402236).xls"
+      },
+      {
+        "course_code": "60081",
+        "course_name": "排球初级班",
+        "source_name": "60081-排球初级班(2026081221402250).xls"
+      },
+      {
+        "course_code": "60151",
+        "course_name": "武术",
+        "source_name": "60151-武术(20260812214022125).xls"
+      },
+      {
+        "course_code": "60171",
+        "course_name": "瑜珈",
+        "source_name": "60171-瑜珈(20260812214022144).xls"
+      },
+      {
+        "course_code": "60191",
+        "course_name": "羽毛球提高班",
+        "source_name": "60191-羽毛球提高班(20260812214022190).xls"
+      },
+      {
+        "course_code": "60241",
+        "course_name": "慢投垒球",
+        "source_name": "60241-慢投垒球(20260812214022218).xls"
+      },
+      {
+        "course_code": "60271",
+        "course_name": "健身气功",
+        "source_name": "60271-健身气功(20260812214022238).xls"
+      },
+      {
+        "course_code": "60291",
+        "course_name": "气排球",
+        "source_name": "60291-气排球(20260812214022253).xls"
+      },
+      {
+        "course_code": "60311",
+        "course_name": "拉丁舞",
+        "source_name": "60311-拉丁舞(20260812214022270).xls"
+      },
+      {
+        "course_code": "60465",
+        "course_name": "特色专业体育",
+        "source_name": "60465-特色专业体育(20260812214022372).xls"
+      },
+      {
+        "course_code": "7010531x",
+        "course_name": "行星科学概论",
+        "source_name": "7010531x-行星科学概论(20260812214257117).xls"
+      },
+      {
+        "course_code": "70202100",
+        "course_name": "诗意的地学：先哲留下的地球说明书",
+        "source_name": "70202100-诗意的地学：先哲留下的地球说明书(20260812214257711).xls"
+      },
+      {
+        "course_code": "70202300",
+        "course_name": "美丽湖北",
+        "source_name": "70202300-美丽湖北(20260812214257737).xls"
+      },
+      {
+        "course_code": "70300600",
+        "course_name": "解码诺贝尔化学奖",
+        "source_name": "70300600-解码诺贝尔化学奖(20260812214257832).xls"
+      },
+      {
+        "course_code": "70602000",
+        "course_name": "AI工具在地学研究中的应用",
+        "source_name": "70602000-AI工具在地学研究中的应用(20260812214258179).xls"
+      },
+      {
+        "course_code": "70701400",
+        "course_name": "深海矿产资源开发概论",
+        "source_name": "70701400-深海矿产资源开发概论(20260812214257982).xls"
+      },
+      {
+        "course_code": "7070576x",
+        "course_name": "瑜伽与减压",
+        "source_name": "7070576x-瑜伽与减压(20260812214257157).xls"
+      },
+      {
+        "course_code": "70802000",
+        "course_name": "Excel +AI在办公与生活中的应用",
+        "source_name": "70802000-Excel +AI在办公与生活中的应用(20260812214257724).xls"
+      },
+      {
+        "course_code": "70802100",
+        "course_name": "经济学概论",
+        "source_name": "70802100-经济学概论(20260812214257846).xls"
+      },
+      {
+        "course_code": "70802500",
+        "course_name": "企业资本运作实务",
+        "source_name": "70802500-企业资本运作实务(20260812214258126).xls"
+      },
+      {
+        "course_code": "7080535x",
+        "course_name": "楚文化概论",
+        "source_name": "7080535x-楚文化概论(20260812214257175).xls"
+      },
+      {
+        "course_code": "7080564x",
+        "course_name": "职业管理",
+        "source_name": "7080564x-职业管理(20260812214257188).xls"
+      },
+      {
+        "course_code": "70900300",
+        "course_name": "西方现代小说选读：战争、影像与创伤",
+        "source_name": "70900300-西方现代小说选读：战争、影像与创伤(20260812214257221).xls"
+      },
+      {
+        "course_code": "7090514x",
+        "course_name": "跨文化交际",
+        "source_name": "7090514x-跨文化交际(20260812214257235).xls"
+      },
+      {
+        "course_code": "7090629x",
+        "course_name": "俄语入门",
+        "source_name": "7090629x-俄语入门(20260812214257248).xls"
+      },
+      {
+        "course_code": "70948300",
+        "course_name": "电子游戏中的语言文化",
+        "source_name": "70948300-电子游戏中的语言文化(20260812214257777).xls"
+      },
+      {
+        "course_code": "71101100",
+        "course_name": "激光雷达技术与应用",
+        "source_name": "71101100-激光雷达技术与应用(20260812214257993).xls"
+      },
+      {
+        "course_code": "71101200",
+        "course_name": "一人公司创业方法与实战",
+        "source_name": "71101200-一人公司创业方法与实战(20260812214258165).xls"
+      },
+      {
+        "course_code": "71201000",
+        "course_name": "全国大学生数学竞赛试题解析",
+        "source_name": "71201000-全国大学生数学竞赛试题解析(2026081221425844).xls"
+      },
+      {
+        "course_code": "71300200",
+        "course_name": "山野穿越拓展",
+        "source_name": "71300200-山野穿越拓展(20260812214257263).xls"
+      },
+      {
+        "course_code": "71400600",
+        "course_name": "珠宝审美与文化",
+        "source_name": "71400600-珠宝审美与文化(2026081221425861).xls"
+      },
+      {
+        "course_code": "71601800",
+        "course_name": "化妆与服饰搭配",
+        "source_name": "71601800-化妆与服饰搭配(20260812214257345).xls"
+      },
+      {
+        "course_code": "71604100",
+        "course_name": "流行歌曲即兴弹唱入门",
+        "source_name": "71604100-流行歌曲即兴弹唱入门(20260812214257818).xls"
+      },
+      {
+        "course_code": "71604300",
+        "course_name": "中国钢琴作品赏析与演奏入门",
+        "source_name": "71604300-中国钢琴作品赏析与演奏入门(20260812214257872).xls"
+      },
+      {
+        "course_code": "71604400",
+        "course_name": "中国音乐地理",
+        "source_name": "71604400-中国音乐地理(20260812214257886).xls"
+      },
+      {
+        "course_code": "71604600",
+        "course_name": "钢琴弹唱艺术与实践",
+        "source_name": "71604600-钢琴弹唱艺术与实践(202608122142587).xls"
+      },
+      {
+        "course_code": "71604800",
+        "course_name": "职业形象与商务礼仪",
+        "source_name": "71604800-职业形象与商务礼仪(20260812214257952).xls"
+      },
+      {
+        "course_code": "71605100",
+        "course_name": "塑形与身材管理",
+        "source_name": "71605100-塑形与身材管理(2026081221425874).xls"
+      },
+      {
+        "course_code": "71801400",
+        "course_name": "中华民族共同体概论",
+        "source_name": "71801400-中华民族共同体概论(20260812214257645).xls"
+      },
+      {
+        "course_code": "71801500",
+        "course_name": "深层自我与人生抉择",
+        "source_name": "71801500-深层自我与人生抉择(2026081221425821).xls"
+      },
+      {
+        "course_code": "71801600",
+        "course_name": "中国近代人物史话",
+        "source_name": "71801600-中国近代人物史话(20260812214258100).xls"
+      },
+      {
+        "course_code": "71901104",
+        "course_name": "深度学习与大语言模型基础",
+        "source_name": "71901104-深度学习与大语言模型基础(20260812214257967).xls"
+      },
+      {
+        "course_code": "7200373x",
+        "course_name": "成功心理学",
+        "source_name": "7200373x-成功心理学(20260812214257421).xls"
+      },
+      {
+        "course_code": "7200619x",
+        "course_name": "毛泽东诗词鉴赏",
+        "source_name": "7200619x-毛泽东诗词鉴赏(20260812214257497).xls"
+      },
+      {
+        "course_code": "72300400",
+        "course_name": "人工智能概论",
+        "source_name": "72300400-人工智能概论(20260812214257657).xls"
+      },
+      {
+        "course_code": "7230647x",
+        "course_name": "分布式并行计算与超级计算前沿",
+        "source_name": "7230647x-分布式并行计算与超级计算前沿(20260812214257513).xls"
+      },
+      {
+        "course_code": "72401100",
+        "course_name": "海洋灾害及其工程防治概论",
+        "source_name": "72401100-海洋灾害及其工程防治概论(2026081221425889).xls"
+      },
+      {
+        "course_code": "72401200",
+        "course_name": "漫谈海洋石油与天然气",
+        "source_name": "72401200-漫谈海洋石油与天然气(20260812214258114).xls"
+      },
+      {
+        "course_code": "7550206x",
+        "course_name": "常见病防治与院前急救",
+        "source_name": "7550206x-常见病防治与院前急救(20260812214257526).xls"
+      },
+      {
+        "course_code": "77200500",
+        "course_name": "华夏文明赏析",
+        "source_name": "77200500-华夏文明赏析(20260812214257553).xls"
+      },
+      {
+        "course_code": "77200700",
+        "course_name": "西班牙语A1",
+        "source_name": "77200700-西班牙语A1(20260812214257567).xls"
+      },
+      {
+        "course_code": "79900104",
+        "course_name": "人工智能与劳动",
+        "source_name": "79900104-人工智能与劳动(20260812214257581).xls"
+      },
+      {
+        "course_code": "79900110",
+        "course_name": "数码钢琴演奏（初级）",
+        "source_name": "79900110-数码钢琴演奏（初级）(20260812214257605).xls"
+      },
+      {
+        "course_code": "79900111",
+        "course_name": "传统吴氏太极拳51式",
+        "source_name": "79900111-传统吴氏太极拳51式(20260812214257593).xls"
+      },
+      {
+        "course_code": "79900113",
+        "course_name": "兵棋推演入门与实践",
+        "source_name": "79900113-兵棋推演入门与实践(20260812214257621).xls"
+      },
+      {
+        "course_code": "znc00011",
+        "course_name": "可持续与绿色金融导论",
+        "source_name": "znc00011-可持续与绿色金融导论(20260812214257538).xls"
+      },
+      {
+        "course_code": "znc00015",
+        "course_name": "商法与企业经营管理",
+        "source_name": "znc00015-商法与企业经营管理(20260812214257632).xls"
+      }
+    ],
+    "unchanged": [
+      {
+        "course_code": "40727000",
+        "course_name": "数控技术实习",
+        "source_name": "40727000-数控技术实习(20260812215000275).xls"
+      },
+      {
+        "course_code": "40741400",
+        "course_name": "机械设计课程设计A",
+        "source_name": "40741400-机械设计课程设计A (20260812215207261).xls"
+      },
+      {
+        "course_code": "60121",
+        "course_name": "跆拳道",
+        "source_name": "60121-跆拳道(2026081221402293).xls"
+      },
+      {
+        "course_code": "60331",
+        "course_name": "踏板操",
+        "source_name": "60331-踏板操(20260812214022286).xls"
+      },
+      {
+        "course_code": "21225101",
+        "course_name": "线性代数A",
+        "source_name": "21225101-线性代数A(20260813165626805).xls"
+      },
+      {
+        "course_code": "71701400",
+        "course_name": "人工智能法学",
+        "source_name": "71701400-人工智能法学(20260812214257911).xls"
+      },
+      {
+        "course_code": "71801700",
+        "course_name": "大学生志愿服务基础理论与项目实操",
+        "source_name": "71801700-大学生志愿服务基础理论与项目实操(20260812214258138).xls"
+      },
+      {
+        "course_code": "7190222x",
+        "course_name": "计算机文化基础",
+        "source_name": "7190222x-计算机文化基础(20260812214257405).xls"
+      }
+    ]
+  }
+}

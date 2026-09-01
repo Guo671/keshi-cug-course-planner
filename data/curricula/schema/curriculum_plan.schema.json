@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.cug-planner.invalid/schema/curriculum_plan.schema.json",
+  "title": "Parsed CUG curriculum plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "institution",
+    "college_id",
+    "college_name",
+    "major",
+    "major_code",
+    "version",
+    "applicable_cohorts",
+    "total_credits",
+    "semester_mapping_2026_fall",
+    "source",
+    "verification",
+    "credit_requirements",
+    "courses",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "plan_id": {"type": "string", "minLength": 1},
+    "institution": {"const": "中国地质大学（武汉）"},
+    "college_id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+    "college_name": {"type": "string", "minLength": 1},
+    "major": {"type": "string", "minLength": 1},
+    "major_code": {"type": "string", "pattern": "^[0-9]{6}[A-Z]{0,2}$"},
+    "version": {"type": "string", "minLength": 1},
+    "applicable_cohorts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "integer", "minimum": 2000}
+    },
+    "total_credits": {"type": "number", "exclusiveMinimum": 0},
+    "semester_mapping_2026_fall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_term",
+        "nominal_by_entry_cohort",
+        "requires_user_confirmation",
+        "confirmation_fields",
+        "note"
+      ],
+      "properties": {
+        "target_term": {"const": "2026年秋季"},
+        "nominal_by_entry_cohort": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["2026", "2025", "2024", "2023"],
+          "properties": {
+            "2026": {"const": 1},
+            "2025": {"const": 3},
+            "2024": {"const": 5},
+            "2023": {"const": 7}
+          }
+        },
+        "requires_user_confirmation": {"const": true},
+        "confirmation_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "note": {"type": "string", "minLength": 1}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "landing_url",
+        "direct_url",
+        "retrieved_at",
+        "sha256",
+        "byte_size",
+        "page_count",
+        "course_table_pages",
+        "pdf_metadata_created",
+        "official_pdf_committed"
+      ],
+      "properties": {
+        "landing_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "direct_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "retrieved_at": {"type": "string", "format": "date"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "byte_size": {"type": "integer", "minimum": 1},
+        "page_count": {"type": "integer", "minimum": 1},
+        "course_table_pages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 1}
+        },
+        "pdf_metadata_created": {"type": "string", "format": "date"},
+        "official_pdf_committed": {"const": false}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "all_course_table_pages_rendered",
+        "all_course_rows_visually_checked",
+        "course_record_count",
+        "required_fields_checked"
+      ],
+      "properties": {
+        "method": {"type": "string", "minLength": 1},
+        "all_course_table_pages_rendered": {"const": true},
+        "all_course_rows_visually_checked": {"const": true},
+        "course_record_count": {"type": "integer", "minimum": 1},
+        "required_fields_checked": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "credit_requirements": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "number", "minimum": 0}
+    },
+    "courses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/course"}
+    },
+    "issues": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/issue"}
+    }
+  },
+  "$defs": {
+    "course": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "name",
+        "credits",
+        "recommended_semester",
+        "semester_credit_distribution",
+        "semester_allocation_note",
+        "category",
+        "required_or_elective",
+        "selection_group",
+        "selection_rule",
+        "source_page",
+        "issue_ids"
+      ],
+      "properties": {
+        "code": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[A-Z0-9*]+$"}
+          ]
+        },
+        "name": {"type": "string", "minLength": 1},
+        "credits": {"type": "number", "exclusiveMinimum": 0},
+        "recommended_semester": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"type": "integer", "minimum": 1, "maximum": 8}
+            }
+          ]
+        },
+        "semester_credit_distribution": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "minProperties": 1,
+              "propertyNames": {"pattern": "^[1-8]$"},
+              "additionalProperties": {"type": "number", "exclusiveMinimum": 0}
+            }
+          ]
+        },
+        "semester_allocation_note": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+        },
+        "category": {
+          "enum": [
+            "通识教育课",
+            "大类平台课",
+            "学科基础课",
+            "专业主干课",
+            "专业选修课",
+            "实践环节",
+            "创新创业自主学习",
+            "创新创业选修课"
+          ]
+        },
+        "required_or_elective": {
+          "enum": ["required", "elective", "requirement_group", "track_choice"]
+        },
+        "selection_group": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+        },
+        "selection_rule": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+        },
+        "source_page": {"type": "integer", "minimum": 1},
+        "issue_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "severity",
+        "source_page",
+        "course_code",
+        "detail",
+        "software_action"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["info", "warning", "error"]},
+        "source_page": {"type": "integer", "minimum": 1},
+        "course_code": {
+          "oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]
+        },
+        "detail": {"type": "string", "minLength": 1},
+        "software_action": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

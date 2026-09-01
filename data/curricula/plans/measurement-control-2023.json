@@ -1,0 +1,1345 @@
+{
+  "schema_version": "1.0.0",
+  "plan_id": "cug-au-080301-2023",
+  "institution": "中国地质大学（武汉）",
+  "college_id": "au",
+  "college_name": "人工智能与自动化学院",
+  "major": "测控技术与仪器",
+  "major_code": "080301",
+  "version": "2023版",
+  "applicable_cohorts": [
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "total_credits": 169.5,
+  "semester_mapping_2026_fall": {
+    "target_term": "2026年秋季",
+    "nominal_by_entry_cohort": {
+      "2026": 1,
+      "2025": 3,
+      "2024": 5,
+      "2023": 7
+    },
+    "requires_user_confirmation": true,
+    "confirmation_fields": [
+      "入学年级",
+      "实际所在学期",
+      "是否休学/转专业/留级/提前修读",
+      "专业与班型"
+    ],
+    "note": "软件只能把入学年级换算为名义学期；实际课程清单必须由用户确认后才能排课。"
+  },
+  "source": {
+    "landing_url": "https://au.cug.edu.cn/info/1016/2304.htm",
+    "direct_url": "https://au.cug.edu.cn/cekongjishuyuyiqizhuanyebenkeshengpeiyangfangan-2023ban.pdf",
+    "retrieved_at": "2026-08-23",
+    "sha256": "91c07f0958df6dad6f9a8c97115563acc0468901bd4baa8a1c502217c0ede52d",
+    "byte_size": 760098,
+    "page_count": 24,
+    "course_table_pages": [
+      19,
+      20,
+      21,
+      22,
+      23,
+      24
+    ],
+    "pdf_metadata_created": "2024-05-16",
+    "official_pdf_committed": false
+  },
+  "verification": {
+    "method": "pdfplumber表格抽取 + PyMuPDF 2.5倍渲染 + 逐页人工视觉复核",
+    "all_course_table_pages_rendered": true,
+    "all_course_rows_visually_checked": true,
+    "course_record_count": 68,
+    "required_fields_checked": [
+      "code",
+      "name",
+      "credits",
+      "recommended_semester",
+      "category",
+      "required_or_elective",
+      "source_page"
+    ]
+  },
+  "credit_requirements": {
+    "通识教育课": 43,
+    "大类平台课": 35.5,
+    "学科基础课": 16,
+    "专业主干课": 19.5,
+    "专业选修课最低修读": 16,
+    "实践环节": 34.5,
+    "创新创业自主学习": 5
+  },
+  "courses": [
+    {
+      "code": "12007800",
+      "name": "马克思主义基本原理",
+      "credits": 3,
+      "recommended_semester": [
+        2
+      ],
+      "semester_credit_distribution": {
+        "2": 3
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "12008100",
+      "name": "毛泽东思想和中国特色社会主义理论体系概论",
+      "credits": 2,
+      "recommended_semester": [
+        4
+      ],
+      "semester_credit_distribution": {
+        "4": 2
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "12008000",
+      "name": "习近平新时代中国特色社会主义思想概论",
+      "credits": 3,
+      "recommended_semester": [
+        4
+      ],
+      "semester_credit_distribution": {
+        "4": 3
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "11711800",
+      "name": "中国近现代史纲要",
+      "credits": 2,
+      "recommended_semester": [
+        2
+      ],
+      "semester_credit_distribution": {
+        "2": 2
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "12007900",
+      "name": "思想道德与法治",
+      "credits": 3,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 3
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "12005300",
+      "name": "形势与政策",
+      "credits": 2,
+      "recommended_semester": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "semester_credit_distribution": null,
+      "semester_allocation_note": "每学期平均分配；源表未给出每学期精确学分。",
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "113076*0",
+      "name": "体育",
+      "credits": 4,
+      "recommended_semester": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "semester_credit_distribution": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "109234*0",
+      "name": "大学英语",
+      "credits": 9,
+      "recommended_semester": [
+        1,
+        2,
+        3
+      ],
+      "semester_credit_distribution": {
+        "1": 3,
+        "2": 3,
+        "3": 3
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "14300300",
+      "name": "军事理论",
+      "credits": 2,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 2
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "12008200",
+      "name": "劳动教育（理论课）",
+      "credits": 1,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 1
+      },
+      "semester_allocation_note": null,
+      "category": "通识教育课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": null,
+      "name": "通识教育选修课程组（含地球科学概论、生态学概论两门必修要求；美育、心理健康教育各不少于2学分；跨学科选修不低于4学分）",
+      "credits": 12,
+      "recommended_semester": null,
+      "semester_credit_distribution": null,
+      "semester_allocation_note": "源表未列入具体学期；需按实际选修课程开课学期确定。",
+      "category": "通识教育课",
+      "required_or_elective": "requirement_group",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": [
+        "general-elective-components-not-enumerated"
+      ]
+    },
+    {
+      "code": "22300100",
+      "name": "自动化与测控技术导论",
+      "credits": 1,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 1
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "20732100",
+      "name": "工程制图",
+      "credits": 2,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 2
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "212127*1",
+      "name": "高等数学A",
+      "credits": 11.5,
+      "recommended_semester": [
+        1,
+        2
+      ],
+      "semester_credit_distribution": {
+        "1": 5,
+        "2": 6.5
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 19,
+      "issue_ids": []
+    },
+    {
+      "code": "21945700",
+      "name": "计算机程序设计基础",
+      "credits": 2.5,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "212130*1",
+      "name": "大学物理A",
+      "credits": 8,
+      "recommended_semester": [
+        2,
+        3
+      ],
+      "semester_credit_distribution": {
+        "2": 4,
+        "3": 4
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "212169*1",
+      "name": "物理实验A",
+      "credits": 2,
+      "recommended_semester": [
+        2,
+        3
+      ],
+      "semester_credit_distribution": {
+        "2": 1,
+        "3": 1
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "21212802",
+      "name": "线性代数B",
+      "credits": 2.5,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "21213501",
+      "name": "概率论与数理统计A",
+      "credits": 3.5,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 3.5
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "21201902",
+      "name": "复变函数与积分变换B",
+      "credits": 2.5,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "大类平台课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22300300",
+      "name": "电路理论",
+      "credits": 4.5,
+      "recommended_semester": [
+        2
+      ],
+      "semester_credit_distribution": {
+        "2": 4.5
+      },
+      "semester_allocation_note": null,
+      "category": "学科基础课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22308100",
+      "name": "模拟电子技术",
+      "credits": 3,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 3
+      },
+      "semester_allocation_note": null,
+      "category": "学科基础课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22308200",
+      "name": "数字电子技术",
+      "credits": 2.5,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "学科基础课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22308510",
+      "name": "自动控制原理I（系统建模与经典控制论）",
+      "credits": 3.5,
+      "recommended_semester": [
+        4
+      ],
+      "semester_credit_distribution": {
+        "4": 3.5
+      },
+      "semester_allocation_note": null,
+      "category": "学科基础课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22315210",
+      "name": "现代工程师教育I（工程与社会、环境与可持续发展、职业规范、工程管理基础）",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "学科基础课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22315220",
+      "name": "现代工程师教育II（工程管理应用、当代企业先进技术）",
+      "credits": 0.5,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 0.5
+      },
+      "semester_allocation_note": null,
+      "category": "学科基础课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22314110",
+      "name": "传感器原理及检测技术I：传感器原理及检测技术基础",
+      "credits": 2.5,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 20,
+      "issue_ids": []
+    },
+    {
+      "code": "22314120",
+      "name": "传感器原理及检测技术II：现代传感器技术",
+      "credits": 1,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 1
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22308610",
+      "name": "嵌入式原理及应用I：微机原理与单片机技术",
+      "credits": 2.5,
+      "recommended_semester": [
+        4
+      ],
+      "semester_credit_distribution": {
+        "4": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22314500",
+      "name": "工程信号分析及处理",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22311500",
+      "name": "计量误差理论",
+      "credits": 1.5,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 1.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22314400",
+      "name": "电子测量原理",
+      "credits": 2.5,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22314600",
+      "name": "嵌入式技术与仪器",
+      "credits": 1.5,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 1.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22314700",
+      "name": "精密机械设计基础",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22314800",
+      "name": "工程光学及光电检测",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "22312100",
+      "name": "智能仪器仪表设计基础",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业主干课",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 21,
+      "issue_ids": []
+    },
+    {
+      "code": "44300400",
+      "name": "军事训练",
+      "credits": 2,
+      "recommended_semester": [
+        1
+      ],
+      "semester_credit_distribution": {
+        "1": 2
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42313300",
+      "name": "计算机程序设计实践",
+      "credits": 2,
+      "recommended_semester": [
+        2
+      ],
+      "semester_credit_distribution": {
+        "2": 2
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42008300",
+      "name": "劳动教育（实践课）",
+      "credits": 1,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 1
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "40724604",
+      "name": "金工实习D",
+      "credits": 1,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 1
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42313400",
+      "name": "电子技术综合实践",
+      "credits": 2,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 2
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42313500",
+      "name": "微控制器技术实习（含企业认知环节）",
+      "credits": 3,
+      "recommended_semester": [
+        4
+      ],
+      "semester_credit_distribution": {
+        "4": 3
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42314400",
+      "name": "测控电路实习",
+      "credits": 3,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 3
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42314600",
+      "name": "传感器与光电检测实践",
+      "credits": 1.5,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 1.5
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42314500",
+      "name": "智能地学虚拟仪器设计",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42314300",
+      "name": "智能感知与控制综合实习",
+      "credits": 5,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 5
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42302500",
+      "name": "生产实习",
+      "credits": 2,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 2
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "42314700",
+      "name": "毕业实习与毕业设计",
+      "credits": 10,
+      "recommended_semester": [
+        8
+      ],
+      "semester_credit_distribution": {
+        "8": 10
+      },
+      "semester_allocation_note": null,
+      "category": "实践环节",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "ZZ35000S",
+      "name": "社会调查",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "创新创业自主学习",
+      "required_or_elective": "required",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": null,
+      "name": "其他（创业基础、学科竞赛、发明创造、科研报告）",
+      "credits": 3,
+      "recommended_semester": null,
+      "semester_credit_distribution": null,
+      "semester_allocation_note": "按学校创新创业自主学习学分认定细则实施。",
+      "category": "创新创业自主学习",
+      "required_or_elective": "requirement_group",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 22,
+      "issue_ids": []
+    },
+    {
+      "code": "22312400",
+      "name": "电子电路仿真与电磁兼容",
+      "credits": 1.5,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 1.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22308900",
+      "name": "虚拟仪器",
+      "credits": 1.5,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 1.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22301602",
+      "name": "现代可编程逻辑器件B",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22311700",
+      "name": "微机原理与接口技术",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22310200",
+      "name": "DSP原理及应用",
+      "credits": 1.5,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 1.5
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22314900",
+      "name": "微弱信号检测基础",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22304700",
+      "name": "物理探测理论及检测技术",
+      "credits": 2,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "20626100",
+      "name": "地球物理方法概论",
+      "credits": 2,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "20617200",
+      "name": "地球物理仪器",
+      "credits": 2,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22312600",
+      "name": "测控软件设计基础",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22310500",
+      "name": "电力电子技术",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22308800",
+      "name": "人工智能基础",
+      "credits": 2,
+      "recommended_semester": [
+        5
+      ],
+      "semester_credit_distribution": {
+        "5": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22303800",
+      "name": "测控系统设计与应用",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22315000",
+      "name": "智能制造大数据技术",
+      "credits": 2,
+      "recommended_semester": [
+        6
+      ],
+      "semester_credit_distribution": {
+        "6": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22311000",
+      "name": "模式识别与机器学习",
+      "credits": 2,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 2
+      },
+      "semester_allocation_note": null,
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": []
+    },
+    {
+      "code": "22315100",
+      "name": "物联网技术",
+      "credits": 2,
+      "recommended_semester": [
+        7
+      ],
+      "semester_credit_distribution": {
+        "7": 1.5
+      },
+      "semester_allocation_note": "源表总学分列为2，但第7学期分配栏为1.5；未擅自修正。",
+      "category": "专业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 23,
+      "issue_ids": [
+        "measurement-iot-credit-conflict"
+      ]
+    },
+    {
+      "code": "22315200",
+      "name": "创新工程实践（智能车方向、机器人方向、自主选题方向）",
+      "credits": 1,
+      "recommended_semester": [
+        4
+      ],
+      "semester_credit_distribution": {
+        "4": 1
+      },
+      "semester_allocation_note": null,
+      "category": "创新创业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 24,
+      "issue_ids": []
+    },
+    {
+      "code": "22313300",
+      "name": "“走进自动化”创新实践",
+      "credits": 1,
+      "recommended_semester": [
+        3
+      ],
+      "semester_credit_distribution": {
+        "3": 1
+      },
+      "semester_allocation_note": null,
+      "category": "创新创业选修课",
+      "required_or_elective": "elective",
+      "selection_group": null,
+      "selection_rule": null,
+      "source_page": 24,
+      "issue_ids": []
+    }
+  ],
+  "issues": [
+    {
+      "id": "measurement-iot-credit-conflict",
+      "severity": "warning",
+      "source_page": 23,
+      "course_code": "22315100",
+      "detail": "源表“物联网技术”总学分列为2，第7学期分配栏为1.5，两者不一致。数据原样保留，需教务确认。",
+      "software_action": "不得用该行自动汇总学期学分；课程是否安排在第7学期可展示为来源建议，但选课前必须确认。"
+    },
+    {
+      "id": "general-elective-components-not-enumerated",
+      "severity": "info",
+      "source_page": 19,
+      "course_code": null,
+      "detail": "通识选修只给出12学分规则，未逐项列出课程号和开课学期。",
+      "software_action": "由用户手动添加具体通识课程，或从当学期课程总库选择。"
+    },
+    {
+      "id": "2026-fall-semester-mapping-user-confirmation",
+      "severity": "warning",
+      "source_page": 1,
+      "course_code": null,
+      "detail": "2026秋的名义学期映射取决于入学年级，休学、转专业、留级和提前修读会改变实际课程。",
+      "software_action": "导入前强制用户确认实际学期、专业和班型。"
+    }
+  ]
+}

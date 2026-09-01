@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.cug-planner.invalid/schema/source_registry.schema.json",
+  "title": "CUG curriculum source registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "retrieved_at",
+    "institution",
+    "scope",
+    "access_levels",
+    "authoritative_sources",
+    "known_registry_issues",
+    "sources"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "retrieved_at": {"type": "string", "format": "date"},
+    "institution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "term_target"],
+      "properties": {
+        "name": {"const": "中国地质大学（武汉）"},
+        "term_target": {"type": "string", "minLength": 1}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "current_catalog_major_count_reported",
+        "current_catalog_unique_major_records_in_registry",
+        "host_college_count",
+        "special_unit_count",
+        "first_enrollment_2026_majors",
+        "registry_entry_count"
+      ],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "current_catalog_major_count_reported": {"type": "integer", "minimum": 1},
+        "current_catalog_unique_major_records_in_registry": {"type": "integer", "minimum": 1},
+        "host_college_count": {"type": "integer", "minimum": 1},
+        "special_unit_count": {"type": "integer", "minimum": 0},
+        "first_enrollment_2026_majors": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "registry_entry_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "access_levels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["A", "B", "C", "D"],
+      "properties": {
+        "A": {"$ref": "#/$defs/accessDefinition"},
+        "B": {"$ref": "#/$defs/accessDefinition"},
+        "C": {"$ref": "#/$defs/accessDefinition"},
+        "D": {"$ref": "#/$defs/accessDefinition"}
+      }
+    },
+    "authoritative_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "url", "published_at", "evidence"],
+        "properties": {
+          "kind": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "published_at": {
+            "oneOf": [{"type": "null"}, {"type": "string", "format": "date"}]
+          },
+          "evidence": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "known_registry_issues": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/registryIssue"}
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/source"}
+    }
+  },
+  "$defs": {
+    "accessDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["access_mode", "status", "meaning"],
+      "properties": {
+        "access_mode": {
+          "enum": ["direct", "captcha/upload_required", "auth_required", "not_found/manual_only"]
+        },
+        "status": {"enum": ["EXACT_VERIFIED", "FOUND_UNPARSED", "LOCKED", "MISSING"]},
+        "meaning": {"type": "string", "minLength": 1}
+      }
+    },
+    "registryIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "severity", "detail"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["info", "warning", "error"]},
+        "detail": {"type": "string", "minLength": 1}
+      }
+    },
+    "cohorts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "through", "explicit"],
+      "properties": {
+        "from": {"oneOf": [{"type": "null"}, {"type": "integer", "minimum": 2000}]},
+        "through": {"oneOf": [{"type": "null"}, {"type": "integer", "minimum": 2000}]},
+        "explicit": {"type": "boolean"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "college_id",
+        "college_name",
+        "major",
+        "major_code",
+        "variant",
+        "cooperative",
+        "catalog_current_2026",
+        "first_enrollment_year",
+        "landing_url",
+        "direct_url",
+        "published_at",
+        "applicable_cohorts",
+        "access_level",
+        "access_mode",
+        "status",
+        "retrieved_at",
+        "evidence",
+        "evidence_urls",
+        "notes"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "college_id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "college_name": {"type": "string", "minLength": 1},
+        "major": {"type": "string", "minLength": 1},
+        "major_code": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[0-9]{6}[A-Z]{0,2}$"}
+          ]
+        },
+        "variant": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]},
+        "cooperative": {"type": "boolean"},
+        "catalog_current_2026": {"type": "boolean"},
+        "first_enrollment_year": {
+          "oneOf": [{"type": "null"}, {"type": "integer", "minimum": 2000}]
+        },
+        "landing_url": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "format": "uri", "pattern": "^https://"}
+          ]
+        },
+        "direct_url": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "format": "uri", "pattern": "^https://"}
+          ]
+        },
+        "published_at": {
+          "oneOf": [{"type": "null"}, {"type": "string", "format": "date"}]
+        },
+        "applicable_cohorts": {"$ref": "#/$defs/cohorts"},
+        "access_level": {"enum": ["A", "B", "C", "D"]},
+        "access_mode": {
+          "enum": ["direct", "captcha/upload_required", "auth_required", "not_found/manual_only"]
+        },
+        "status": {"enum": ["EXACT_VERIFIED", "FOUND_UNPARSED", "LOCKED", "MISSING"]},
+        "retrieved_at": {"type": "string", "format": "date"},
+        "evidence": {"type": "string", "minLength": 1},
+        "evidence_urls": {
+          "type": "array",
+          "items": {"type": "string", "format": "uri", "pattern": "^https://"}
+        },
+        "notes": {"type": "string"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"access_level": {"const": "A"}}},
+          "then": {
+            "properties": {
+              "access_mode": {"const": "direct"},
+              "status": {"const": "EXACT_VERIFIED"},
+              "direct_url": {"type": "string"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"access_level": {"const": "B"}}},
+          "then": {
+            "properties": {
+              "access_mode": {"const": "captcha/upload_required"},
+              "status": {"const": "FOUND_UNPARSED"},
+              "direct_url": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"access_level": {"const": "C"}}},
+          "then": {
+            "properties": {
+              "access_mode": {"const": "auth_required"},
+              "status": {"const": "LOCKED"},
+              "direct_url": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"access_level": {"const": "D"}}},
+          "then": {
+            "properties": {
+              "access_mode": {"const": "not_found/manual_only"},
+              "status": {"const": "MISSING"},
+              "direct_url": {"type": "null"}
+            }
+          }
+        }
+      ]
+    }
+  }
+}
