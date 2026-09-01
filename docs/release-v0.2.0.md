@@ -4,7 +4,7 @@
 
 ## 下载与运行
 
-1. 下载 `课石-v0.2.0-win64.zip` 和 `SHA256SUMS.txt`。
+1. 下载 `keshi-v0.2.0-win64.zip` 和 `SHA256SUMS.txt`。
 2. 核对 SHA-256 后完整解压到普通文件夹。
 3. 在 Windows 10/11 64 位系统中双击 `Keshi.exe`。
 

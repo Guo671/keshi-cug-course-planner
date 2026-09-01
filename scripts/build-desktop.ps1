@@ -15,9 +15,10 @@ $SeedDatabase = Join-Path $DesktopBuildRoot 'seed\planner.db'
 # Build the Chinese product name from Unicode code points so this script remains ASCII-safe.
 $ProductName = [string][char]0x8BFE + [string][char]0x77F3
 $BundleName = "$ProductName-v0.2.0-win64"
+$ReleaseFileName = 'keshi-v0.2.0-win64.zip'
 $BundleDir = Join-Path $DistRoot $BundleName
 $ReleaseDir = Join-Path $ProjectRoot 'release'
-$ZipPath = Join-Path $ReleaseDir "$BundleName.zip"
+$ZipPath = Join-Path $ReleaseDir $ReleaseFileName
 $SmokeRoot = $null
 
 function Invoke-Checked {
@@ -122,7 +123,7 @@ try {
     Compress-Archive -LiteralPath $BundleDir -DestinationPath $ZipPath -CompressionLevel Optimal
     $Hash = (Get-FileHash -LiteralPath $ZipPath -Algorithm SHA256).Hash.ToLowerInvariant()
     $ChecksumPath = Join-Path $ReleaseDir 'SHA256SUMS.txt'
-    $ChecksumLine = "$Hash  $BundleName.zip`n"
+    $ChecksumLine = "$Hash  $ReleaseFileName`n"
     [IO.File]::WriteAllText(
         $ChecksumPath,
         $ChecksumLine,

@@ -8,7 +8,7 @@
 
 ### Windows 便携版（推荐）
 
-从发布页下载 `课石-v0.2.0-win64.zip` 和 `SHA256SUMS.txt`，核对 SHA-256 后把压缩包**完整解压**到普通文件夹；不要在压缩软件中直接运行，也不要只复制 exe。Windows 10/11 64 位用户双击 `Keshi.exe` 即可，无需安装 Python。系统还需要 Microsoft Edge WebView2 Runtime，Windows 10/11 通常已经预装；若课石明确提示缺少，请安装微软官方 Evergreen Runtime 后重试。
+从发布页下载 `keshi-v0.2.0-win64.zip` 和 `SHA256SUMS.txt`，核对 SHA-256 后把压缩包**完整解压**到普通文件夹；不要在压缩软件中直接运行，也不要只复制 exe。Windows 10/11 64 位用户双击 `Keshi.exe` 即可，无需安装 Python。系统还需要 Microsoft Edge WebView2 Runtime，Windows 10/11 通常已经预装；若课石明确提示缺少，请安装微软官方 Evergreen Runtime 后重试。
 
 首次启动会把内置课程总库复制到 `%LOCALAPPDATA%\Keshi\data\planner.db`。账号、草稿、偏好和历史方案都保存在这里，升级或更换便携包不会覆盖。备份时先退出课石，再复制整个 `%LOCALAPPDATA%\Keshi` 文件夹；日志位于其中的 `logs\desktop.log`。课石仅在本机回环地址启动服务，不对局域网开放。
 
@@ -157,7 +157,7 @@ API 文档在软件启动后访问 `http://127.0.0.1:8765/api/docs`。
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-desktop.ps1
 ```
 
-脚本会安装固定的桌面构建依赖、生成多尺寸图标、制作课程库种子、运行测试、构建 PyInstaller one-folder、执行冻结程序 smoke test，并生成 `release\课石-v0.2.0-win64.zip` 与 UTF-8 `release\SHA256SUMS.txt`。种子制作有严格隐私门禁：若 `var\planner.db` 的账号、会话、学生档案、偏好或历史方案表含有任何记录，构建会拒绝继续，绝不会把本地用户数据打进发布包。`-SkipTests -SkipInstall` 只适用于当前环境已完成相应步骤的重复构建。
+脚本会安装固定的桌面构建依赖、生成多尺寸图标、制作课程库种子、运行测试、构建 PyInstaller one-folder、执行冻结程序 smoke test，并生成 `release\keshi-v0.2.0-win64.zip` 与 UTF-8 `release\SHA256SUMS.txt`。种子制作有严格隐私门禁：若 `var\planner.db` 的账号、会话、学生档案、偏好或历史方案表含有任何记录，构建会拒绝继续，绝不会把本地用户数据打进发布包。`-SkipTests -SkipInstall` 只适用于当前环境已完成相应步骤的重复构建。
 
 ## 明确限制
 
