@@ -22,7 +22,6 @@ class Settings:
 
     database_url: str
     session_hours: int = 72
-    curriculum_registry_path: Path = PROJECT_ROOT / "data" / "curricula" / "source_registry.json"
     static_dir: Path = PROJECT_ROOT / "frontend"
     catalog_dir: Path = PROJECT_ROOT / "data" / "catalog"
 
@@ -42,15 +41,7 @@ class Settings:
         return cls(
             database_url=database_url,
             session_hours=session_hours,
-            curriculum_registry_path=Path(
-                values.get(
-                    "CUG_PLANNER_CURRICULUM_REGISTRY_PATH",
-                    str(resource_root / "data" / "curricula" / "source_registry.json"),
-                )
-            ),
-            static_dir=Path(
-                values.get("CUG_PLANNER_STATIC_DIR", str(resource_root / "frontend"))
-            ),
+            static_dir=Path(values.get("CUG_PLANNER_STATIC_DIR", str(resource_root / "frontend"))),
             catalog_dir=Path(
                 values.get("CUG_PLANNER_CATALOG_DIR", str(resource_root / "data" / "catalog"))
             ),

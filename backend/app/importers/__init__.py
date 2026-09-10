@@ -1,4 +1,4 @@
-"""Source importers for course schedules and curriculum plans."""
+"""Source importers for Excel course schedules."""
 
 from .catalog_merge import (
     MergedCatalog,

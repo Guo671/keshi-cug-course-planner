@@ -6,6 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Header, HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from ..config import settings
 from ..infrastructure.security import (
@@ -39,7 +40,11 @@ def register(payload: RegisterRequest, db: Database) -> TokenResponse:
         raise HTTPException(status_code=409, detail="用户名已存在")
     user = User(username=username, password_hash=password_hash)
     db.add(user)
-    db.flush()
+    try:
+        db.flush()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="用户名已存在，请换一个用户名") from exc
     return _issue_token(db, user)
 
 

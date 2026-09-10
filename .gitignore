@@ -29,3 +29,12 @@ data/import-staging/
 # Reproducible desktop-build outputs.
 release/*.zip
 desktop/assets/app.png
+
+# Local working notes and database sidecars must not enter the public source.
+docs/repair-*.md
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+release/*/

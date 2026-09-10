@@ -26,6 +26,7 @@ class IssueSeverity(StrEnum):
 
 
 class TimePrecision(StrEnum):
+    NON_BLOCKING = "non_blocking"
     EXACT_SLOT = "exact_slot"
     WEEK_ONLY = "week_only"
     TBD = "tbd"
@@ -110,6 +111,8 @@ class ImportedMeeting:
 
     @property
     def reliable_for_scheduling(self) -> bool:
+        if self.precision is TimePrecision.NON_BLOCKING:
+            return True
         if self.precision is not TimePrecision.EXACT_SLOT:
             return False
         if not self.weeks or self.weekday is None:

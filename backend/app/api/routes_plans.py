@@ -4,13 +4,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query
 
-from ..application.curricula import (
-    CurriculumError,
-    mixed_curriculum_warnings,
-    resolve_required_curriculum_choices,
-    validate_curriculum_selection,
-)
-from ..application.planner import PlanningInputError, generate_schedule
+from ..application.planner import generate_schedule
 from ..application.planning_storage import (
     CorruptPlanningDataError,
     DraftNotFoundError,
@@ -23,7 +17,6 @@ from ..application.planning_storage import (
 )
 from .dependencies import CurrentUser, Database
 from .schemas import (
-    InputMode,
     PlanningDraft,
     PlanningDraftResponse,
     PlanningRunDetail,
@@ -82,26 +75,11 @@ def generate(payload: PlanRequest, db: Database, user: CurrentUser) -> PlanRespo
     if user.profile is None:
         raise HTTPException(status_code=409, detail="请先明确填写学院、专业和入学年级")
     try:
-        resolved_choices = None
-        curriculum_warnings: list[str] = []
-        if payload.input_mode is InputMode.CURRICULUM:
-            if payload.curriculum is None:
-                raise CurriculumError("培养方案模式缺少来源与学期确认")
-            resolution = resolve_required_curriculum_choices(db, user.profile, payload.curriculum)
-            resolved_choices = list(resolution.choices)
-            curriculum_warnings = list(resolution.warnings)
-        elif payload.input_mode is InputMode.MIXED:
-            if payload.curriculum is None:
-                raise CurriculumError("混合方式缺少培养方案来源")
-            preview = validate_curriculum_selection(db, user.profile, payload.curriculum)
-            curriculum_warnings = mixed_curriculum_warnings(preview, payload.manual_courses)
         response = generate_schedule(
             db,
             user,
             payload,
-            resolved_choices=resolved_choices,
-            additional_warnings=curriculum_warnings,
         )
-    except (CurriculumError, PlanningInputError) as exc:
+    except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     return PlanResponse.model_validate(response)

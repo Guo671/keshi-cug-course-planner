@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="中国地质大学（武汉）2026 年秋季本地智能排课助手"
+      content="课石通用本地排课助手，由果果开发"
     />
-    <title>课石 · 地大排课助手</title>
+    <title>课石 · 排课助手</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
+    <script src="/course-editor.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -28,18 +29,10 @@
     </svg>
 
     <div id="auth-screen" class="auth-screen">
-      <section class="auth-story" aria-label="产品介绍">
+      <section class="auth-story" aria-label="课石">
         <div class="brand-mark" aria-hidden="true"><svg><use href="#planner-logo"></use></svg></div>
-        <p class="eyebrow">课石 · CUG 2026 秋</p>
-        <h1>把想上的课，<br />排成真正可执行的课表。</h1>
-        <p class="auth-lead">
-          按教学周精确识别冲突，尊重空闲时间和教师偏好，并解释每一门课为什么能排或不能排。
-        </p>
-        <div class="trust-list">
-          <div><span>01</span><p>本地运行，不索取学校统一认证密码</p></div>
-          <div><span>02</span><p>旧版独有教学班明确标注、默认不参与可靠排课</p></div>
-          <div><span>03</span><p>只辅助制定方案，最终仍需在教务系统核对和选课</p></div>
-        </div>
+        <div class="auth-product-name"><h1>课石</h1><small>由果果开发</small></div>
+        <button class="text-button" type="button" data-open-help>使用说明</button>
       </section>
 
       <section class="auth-card" aria-labelledby="auth-title">
@@ -77,10 +70,11 @@
       <header class="topbar">
         <a href="#profile-step" class="brand" aria-label="课石首页">
           <span class="brand-mark small" aria-hidden="true"><svg><use href="#planner-logo"></use></svg></span>
-          <span><strong>课石</strong><small>地大排课助手 · 2026 秋</small></span>
+          <span><strong>课石</strong><small>通用排课助手</small></span>
         </a>
-        <div class="term-pill"><span class="live-dot"></span>2026-2027-1</div>
+        <div class="term-pill" id="current-term-pill"><span class="live-dot"></span>2026-2027-1</div>
         <nav aria-label="账户导航">
+          <button class="button ghost small-button" type="button" data-open-help>使用说明</button>
           <span id="current-user" class="current-user"></span>
           <button id="logout-button" class="button ghost small-button" type="button">退出</button>
         </nav>
@@ -117,25 +111,26 @@
             <div>
               <p class="eyebrow">课石 · 本地排课工作台</p>
               <h1 id="welcome-title">今天也把课表安排得舒服一点。</h1>
-              <p>先确认身份，再把课程和偏好交给软件；每一步都会自动保存。</p>
+              <p>导入课表、补充课程，再安排适合自己的时间。课程和偏好会自动保存。</p>
             </div>
             <div class="welcome-tags" aria-label="产品特性"><span>仅本地账户</span><span>修改自动保存</span></div>
           </section>
 
           <section id="profile-step" class="step-section">
             <div class="section-heading">
-              <div><p class="eyebrow">步骤 01</p><h2>先确认你属于哪套培养方案</h2></div>
+              <div><p class="eyebrow">步骤 01</p><h2>确认学期与学生信息</h2></div>
               <span id="profile-status" class="badge warning">待填写</span>
             </div>
             <p class="section-intro">
-              学院、专业、年级和培养方案变体共同决定课程建议。转专业、休学或留级学生应手动指定实际学期。
+              选择目标学期并填写基本信息。行政班号用于优先推荐面向本班的教学班。
             </p>
             <form id="profile-form" class="card form-grid">
+              <label>学校（选填）<input id="profile-school" maxlength="128" placeholder="填写自己的学校名称" /></label>
               <label>
                 学院 <span class="required">必填</span>
                 <input id="profile-college" list="college-list" maxlength="128" required />
                 <datalist id="college-list">
-                  <option value="地球科学学院"></option><option value="资源学院"></option>
+                  <option value="地球科学学院"></option><option value="资源学院"></option><option value="工程学院"></option>
                   <option value="材料与化学学院"></option><option value="环境学院"></option>
                   <option value="地球物理与空间信息学院"></option><option value="海洋学院"></option>
                   <option value="机械与电子信息学院"></option><option value="自动化学院"></option>
@@ -164,30 +159,18 @@
                   <option value="2016">2016 级</option><option value="2015">2015 级</option>
                 </select>
               </label>
-              <label>
-                培养方案变体
-                <input id="profile-variant" placeholder="如：卓越计划、基地班、辅修" maxlength="128" />
-              </label>
-              <label>
-                专业代码
-                <input id="profile-major-code" placeholder="如已知可填写" maxlength="32" />
-              </label>
+              <label>目标学期年份<input id="target-year" type="number" min="2020" max="2100" value="2026" required /></label>
+              <label>目标学期<select id="target-season"><option value="fall">秋季</option><option value="spring">春季</option></select></label>
+
+
               <label>
                 行政班号 / 推荐课表班号 <span class="recommended">强烈建议</span>
                 <input id="profile-administrative-class" placeholder="例如：072242" maxlength="32" autocomplete="off" />
                 <small class="field-hint">用于优先匹配教学班组成，并标出跨行政班备选；不填写仍可排课。</small>
               </label>
+
               <label>
-                合作或联合培养 <span class="required">必填</span>
-                <select id="profile-cooperation" required>
-                  <option value="无">无</option>
-                  <option value="中外合作办学">中外合作办学</option>
-                  <option value="联合培养">联合培养</option>
-                  <option value="安哈尔特项目">安哈尔特项目</option>
-                </select>
-              </label>
-              <label>
-                实际方案学期
+                实际所在学期（选填）
                 <select id="profile-semester">
                   <option value="">按年级推算后确认</option>
                   <option value="1">第 1 学期</option><option value="3">第 3 学期</option>
@@ -209,49 +192,25 @@
               <div><p class="eyebrow">步骤 02</p><h2>确定本学期要上的课程</h2></div>
               <span id="course-count" class="count-pill">0 门</span>
             </div>
-            <p class="lock-note">请先保存学院、专业、精确年级和培养方案身份，再设置本学期课程。</p>
-            <div class="mode-cards" role="radiogroup" aria-label="课程输入方式">
-              <label class="mode-card active">
-                <input type="radio" name="input-mode" value="manual" checked />
-                <span class="mode-number">A</span><strong>手动输入</strong>
-                <small>用课程名称或课程号逐门添加，适用于所有学生。</small>
-              </label>
-              <label class="mode-card">
-                <input type="radio" name="input-mode" value="curriculum" />
-                <span class="mode-number">B</span><strong>培养方案</strong>
-                <small>从已找到且可解析的官方培养方案载入本学期课程。</small>
-              </label>
-              <label class="mode-card">
-                <input type="radio" name="input-mode" value="mixed" />
-                <span class="mode-number">C</span><strong>混合方式</strong>
-                <small>先载入培养方案，再自由增删和补充课程。</small>
-              </label>
+            <p class="lock-note">请先保存学生信息，再添加本学期课程。</p>
+            <div class="add-methods" aria-label="添加课程方式">
+              <a href="#course-search" class="method-card"><span class="method-icon">⌕</span><strong>从总库找课</strong><small>输入课程名称或课程号</small></a>
+              <button id="open-import-workbooks" class="method-card ocean" type="button"><span class="method-icon">↥</span><strong>导入课程课表</strong><small>1–20 个 XLS / XLSX</small></button>
+              <button id="open-manual-editor" class="method-card sky" type="button"><span class="method-icon">＋</span><strong>自行填写课程</strong><small>名称与时间必填，其余选填</small></button>
             </div>
-
-            <div id="curriculum-panel" class="card curriculum-panel hidden">
-              <div class="panel-title-row">
-                <div><h3>官方培养方案匹配</h3><p class="muted">只采用学校或学院官网来源。</p></div>
-                <span id="curriculum-status" class="badge neutral">等待匹配</span>
-              </div>
-              <div id="curriculum-evidence" class="evidence-box">请先保存学生信息。</div>
-              <div id="pure-curriculum-note" class="mode-notice hidden">
-                <strong>纯培养方案模式只自动提交可安全匹配的必修课。</strong>
-                方向组、未匹配课程和只有风险教学班的课程不会被静默当作已完成；它们会持续列在生成结果的警告中。若要逐门增删、锁定或排除教学班，请改用混合方式。
-              </div>
-              <div class="curriculum-confirmations">
-                <label class="toggle-row"><input id="confirm-semester" type="checkbox" /><span><strong>我已核对实际所在学期</strong><small>入学年级只是默认推算；转专业、休学、留级或提前修读时需修正</small></span></label>
-                <label id="optional-courses-row" class="toggle-row"><input id="include-optional" type="checkbox" /><span><strong>混合模式同时载入选修候选</strong><small>方向课与课程组不会被当成全部必修，载入后请逐门删选</small></span></label>
-              </div>
-              <div id="curriculum-course-list" class="curriculum-course-list"></div>
-              <div class="inline-actions">
-                <button id="refresh-curriculum" class="button secondary" type="button">重新匹配</button>
-                <button id="import-curriculum" class="button primary" type="button" disabled>载入本学期课程</button>
-              </div>
-            </div>
+            <p class="section-intro">先确定你想上的课，再选择教学班。同一课程可有多个备选班，每个班的所有上课时段都参与冲突检查。</p>
 
             <div id="manual-course-workspace" class="course-layout">
               <div class="card search-panel">
-                <h3>添加课程</h3>
+                <h3>课程导入与搜索</h3><p id="catalog-scope-label" class="form-hint"></p>
+                <div class="import-workspace">
+                <strong>已经有课程课表？直接导入</strong>
+                <label>从电脑导入 1–20 个课程课表（XLS / XLSX）<input id="direct-course-files" type="file" accept=".xls,.xlsx" multiple /></label>
+                <button id="import-direct-courses" class="button secondary" type="button">导入到待排课程</button>
+                <p id="direct-import-status" class="import-status" role="status">支持学校导出的 Excel 课程课表，不支持 PDF。</p>
+                <button id="download-course-template" class="text-button" type="button">下载标准 Excel 模板</button>
+                <p class="form-hint">模板一行一个时段；同一门课、同一教学班可填写多行。不同教学班是备选。</p>
+                </div>
                 <label class="search-box">
                   <span class="sr-only">课程名称或课程号</span>
                   <input id="course-search" placeholder="例如：高等数学，或 20739000" maxlength="100" />
@@ -271,6 +230,14 @@
               </div>
             </div>
           </section>
+
+          <details class="card" id="catalog-management"><summary>课程总库管理（导入或删除总库）</summary>
+            <p>一次选择同一学期的 1–5 个 ZIP，内含学校导出的 XLS / XLSX 课程课表。所有压缩包合并为一个新总库，成功后整体替换旧库。账号、手动课程和历史方案保留。</p>
+            <input id="catalog-files" type="file" accept=".zip" multiple />
+            <div class="inline-actions"><button id="import-catalog" class="button secondary" type="button">导入并替换总库</button><button id="delete-catalog" class="button secondary" type="button">删除课程总库</button></div>
+            <p id="catalog-import-status" role="status"></p>
+            <button id="restore-builtin-catalog" class="text-button" type="button">恢复本版本内置总库</button>
+          </details>
 
           <section id="constraint-step" class="step-section locked-section">
             <div class="section-heading">
@@ -313,8 +280,8 @@
                 <label class="toggle-row"><input id="prefer-no-early" type="checkbox" /><span><strong>尽量不要早课</strong><small>第 1–2 节作为软偏好避开</small></span></label>
                 <label class="toggle-row"><input id="prefer-no-evening" type="checkbox" /><span><strong>尽量不要晚课</strong><small>第 9 节以后作为软偏好避开</small></span></label>
                 <label class="toggle-row"><input id="prefer-compact" type="checkbox" /><span><strong>课程集中到更少天</strong><small>在课程覆盖相同的前提下减少上课日</small></span></label>
-                <label class="toggle-row"><select id="selection-phase"><option value="preselection">预选阶段</option><option value="confirmation" selected>确认阶段（8月23日当前）</option><option value="add_drop">补退选阶段</option><option value="retake">重修选课阶段</option></select><span><strong>当前选课阶段（请确认）</strong><small>影响容量、冲突和推荐课的解释</small></span></label>
-                <label id="retake-confirm-row" class="toggle-row hidden"><input id="retake-confirm" type="checkbox" /><span><strong>确认具备重修资格</strong><small>仅不及格或缓考课程可在重修阶段选择</small></span></label>
+                <label class="toggle-row"><select id="selection-phase"><option value="planning" selected>通用排课模式</option><option value="preselection">预选阶段</option><option value="confirmation">确认阶段</option><option value="add_drop">补退选阶段</option><option value="retake">重修选课阶段</option></select><span><strong>当前选课阶段（请确认）</strong><small>影响容量、冲突和推荐课的解释</small></span></label>
+                <label id="retake-confirm-row" class="toggle-row hidden"><input id="retake-confirm" type="checkbox" /><span><strong>确认具备重修资格</strong><small>请先核对自己符合所在学校的重修条件</small></span></label>
               </div>
             </div>
             <div id="constraint-list" class="rule-list"></div>
@@ -338,16 +305,28 @@
             <div id="plan-results" class="plan-results">
               <div class="empty-state result-empty"><span>▦</span><p>完成前三步后，在这里查看候选课表</p></div>
             </div>
+            <div id="adjustment-results" aria-live="polite"></div>
+            <button id="more-plans" class="button secondary hidden" type="button">再显示 10 种方案</button>
           </section>
 
           <footer>
-            <p>数据仅用于本地排课辅助 · 容量、先修要求与最终开放状态请以教务系统为准</p>
-            <a href="/api/docs" target="_blank" rel="noreferrer">API 与数据说明</a>
+            <p>由果果开发 · 本地排课辅助工具 · 选课要求以所在学校为准</p>
+            <button class="text-button" type="button" data-open-help>使用说明</button>
           </footer>
         </main>
       </div>
     </div>
 
+    <dialog id="help-dialog" aria-label="课石使用说明"><div class="help-toolbar"><strong>使用说明</strong><button class="button secondary" type="button" id="close-help">关闭说明</button></div><iframe id="help-frame" title="课石详细使用说明"></iframe></dialog>
+    <dialog id="course-editor"><form id="course-editor-form">
+      <div class="panel-title-row"><h2>填写或修改课程</h2><button type="button" id="close-course-editor" class="text-button">取消</button></div>
+      <p>普通课程须填写名称、周次、星期和节次；时间未定的实践类安排可设为不占用时段。一个教学班的所有时段都要参加；不同教学班作为备选，排课时只选其中一个。</p>
+      <div class="two-columns"><label>课程名称<input id="custom-name" required maxlength="256" /></label><label>课程号（选填）<input id="custom-code" maxlength="64" /></label></div>
+      <div id="custom-sections"></div>
+      <label id="component-confirm-row" class="toggle-row hidden"><input id="component-confirm" type="checkbox" /><span>我已核对理论和实验组成：每一组都包含必须一起上的全部时段，不同组之间只选一组。</span></label>
+      <div class="inline-actions editor-footer"><button id="add-custom-section" type="button" class="button secondary">添加备选教学班</button><button type="submit" class="button primary">保存课程</button></div>
+      <p id="custom-error" class="form-error" role="alert"></p>
+    </form></dialog>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

@@ -15,6 +15,8 @@
 | SQLAlchemy | 2.0.52 | MIT |
 | Uvicorn | 0.52.4 | BSD-3-Clause |
 | xlrd | 2.0.2 | BSD |
+| openpyxl | 3.1.5 | MIT |
+| et_xmlfile | 2.0.0 | MIT |
 | pywebview | 6.2.1 | BSD-3-Clause |
 | Pillow | 12.3.0 | MIT-CMU |
 | PyInstaller | 6.22.2 | GPL-2.0-or-later with the PyInstaller bootloader exception |

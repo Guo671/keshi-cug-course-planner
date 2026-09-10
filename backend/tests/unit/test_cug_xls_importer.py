@@ -224,3 +224,29 @@ def _matrix(
     matrix[7][0:2] = ["晚上", "六"]
     matrix[-1][0] = NOTE
     return matrix
+
+
+@pytest.mark.parametrize(('label','expected'),[
+    ('测试课程-00011','00011'),('测试课程-机电0001','机电0001'),('测试课程-B3-15','B3-15'),
+])
+def test_real_teaching_class_label_formats_are_not_misclassified(label,expected):
+    matrix=_matrix('20700000','测试课程','测试学院')
+    matrix[2][2]=f'老师/1-5周/南望山校区 教一楼101/{label}/072242/0/考试'
+    course=parse_schedule_matrix(matrix,source=_source('new','20700000-测试课程(123).xls'))
+    section=course.teaching_classes[0]
+    assert section.section_code==expected
+    assert section.reliable_for_scheduling
+    assert not section.needs_confirmation
+
+
+def test_practice_slash_name_retains_weeks_and_teacher_without_inventing_slots():
+    from app.importers.cug_xls import _parse_practice_record
+    from app.importers.models import CellReference
+    record=_parse_practice_record(
+        'C/C++语言课程设计测试教师(共2周)/20-21周/C/C++语言课程设计-0001/075261',
+        source=_source('new','41948300-C-C++语言课程设计(123).xls'),
+        cell=CellReference('Sheet0',10,1),total_weeks=21,course_names=('C/C++语言课程设计',))
+    assert record.weeks==(20,21)
+    assert record.instructors==('测试教师',)
+    assert record.weekday is None and record.start_period is None
+    assert record.precision==TimePrecision.WEEK_ONLY

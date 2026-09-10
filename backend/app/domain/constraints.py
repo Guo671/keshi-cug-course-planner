@@ -15,6 +15,7 @@ class ConstraintStrength(StrEnum):
 
 
 class SelectionPhase(StrEnum):
+    PLANNING = "planning"
     PRESELECTION = "preselection"
     CONFIRMATION = "confirmation"
     ADD_DROP = "add_drop"

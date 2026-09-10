@@ -50,6 +50,7 @@ def hash_token(token: str) -> str:
 
 
 def create_login_session(db: Session, user: User, *, lifetime_hours: int) -> tuple[str, datetime]:
+    db.execute(delete(LoginSession).where(LoginSession.expires_at <= datetime.now(UTC)))
     raw_token = secrets.token_urlsafe(32)
     expires_at = datetime.now(UTC) + timedelta(hours=lifetime_hours)
     db.add(
@@ -64,7 +65,6 @@ def create_login_session(db: Session, user: User, *, lifetime_hours: int) -> tup
 
 def get_user_for_token(db: Session, token: str) -> User | None:
     now = datetime.now(UTC)
-    db.execute(delete(LoginSession).where(LoginSession.expires_at <= now))
     session = db.scalar(
         select(LoginSession).where(
             LoginSession.token_hash == hash_token(token), LoginSession.expires_at > now

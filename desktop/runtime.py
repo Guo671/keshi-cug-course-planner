@@ -40,7 +40,6 @@ class RuntimePaths:
     seed_database_path: Path
     static_dir: Path
     catalog_dir: Path
-    curriculum_registry_path: Path
     webview_storage_path: Path
     log_path: Path
     icon_path: Path
@@ -74,9 +73,6 @@ class RuntimePaths:
             seed_database_path=seed_path,
             static_dir=resource_root / "frontend",
             catalog_dir=resource_root / "data" / "catalog",
-            curriculum_registry_path=(
-                resource_root / "data" / "curricula" / "source_registry.json"
-            ),
             webview_storage_path=selected_root / "webview",
             log_path=selected_root / "logs" / "desktop.log",
             icon_path=resource_root / "desktop" / "assets" / "app.ico",
@@ -91,8 +87,9 @@ class RuntimePaths:
         required = (
             self.static_dir / "index.html",
             self.static_dir / "app.js",
+            self.static_dir / "course-editor.js",
+            self.static_dir / "help.html",
             self.static_dir / "styles.css",
-            self.curriculum_registry_path,
             self.seed_database_path,
         )
         missing = [str(path) for path in required if not path.is_file()]
@@ -114,9 +111,6 @@ class RuntimePaths:
                 ),
                 "CUG_PLANNER_STATIC_DIR": str(self.static_dir),
                 "CUG_PLANNER_CATALOG_DIR": str(self.catalog_dir),
-                "CUG_PLANNER_CURRICULUM_REGISTRY_PATH": str(
-                    self.curriculum_registry_path
-                ),
             }
         )
 
@@ -138,9 +132,7 @@ def verify_database(path: Path, *, require_catalog_rows: bool = True) -> dict[st
                 raise DesktopRuntimeError(f"课程数据库完整性检查失败：{path}")
             tables = {
                 row[0]
-                for row in connection.execute(
-                    "SELECT name FROM sqlite_master WHERE type = 'table'"
-                )
+                for row in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
             }
             missing_tables = REQUIRED_DATABASE_TABLES - tables
             if missing_tables:
@@ -406,6 +398,30 @@ def smoke_test(paths: RuntimePaths) -> dict[str, object]:
     server = BackendServer(reserved)
     try:
         health = server.start()
+        from io import BytesIO
+
+        from openpyxl import Workbook, load_workbook
+
+        from app.scheduling.solver import cp_model
+
+        if cp_model is None:
+            raise DesktopRuntimeError("便携包缺少 CP-SAT 求解器")
+        model = cp_model.CpModel()
+        value = model.new_bool_var("smoke")
+        model.add(value == 1)
+        solver = cp_model.CpSolver()
+        if solver.solve(model) != cp_model.OPTIMAL or solver.value(value) != 1:
+            raise DesktopRuntimeError("便携包求解器自检失败")
+        workbook = Workbook()
+        workbook.active["A1"] = "课石 Excel 自检"
+        stream = BytesIO()
+        workbook.save(stream)
+        check = load_workbook(BytesIO(stream.getvalue()), read_only=True)
+        try:
+            if check.active["A1"].value != "课石 Excel 自检":
+                raise DesktopRuntimeError("便携包 Excel 自检失败")
+        finally:
+            check.close()
         return {
             "status": "ok",
             "version": APP_VERSION,
@@ -416,6 +432,8 @@ def smoke_test(paths: RuntimePaths) -> dict[str, object]:
             "port": reserved.port,
             "preferred_port": reserved.used_preferred_port,
             "health": health,
+            "solver": "cp-sat",
+            "excel": "xlsx",
         }
     finally:
         server.stop()

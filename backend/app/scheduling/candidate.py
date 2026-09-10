@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ..domain.conflicts import has_internal_conflict
 from ..domain.constraints import ConstraintStrength, SelectionPhase
 from ..domain.models import AvailabilityStatus, SectionOption
 from ..domain.planning import RejectionReason, SchedulingProblem
@@ -62,6 +63,14 @@ def evaluate_candidates(problem: SchedulingProblem) -> CandidateAudit:
         soft: list[RejectionReason] = []
         soft_penalty = 0
         course = course_by_id[option.course_id]
+        if has_internal_conflict(option):
+            hard.append(
+                RejectionReason(
+                    code="INTERNAL_TIME_CONFLICT",
+                    message="同一教学班组内存在相互冲突的上课时段，请核对组合或时间后重新排课",
+                    related_ids=(option.id,),
+                )
+            )
 
         if (
             course.availability is not AvailabilityStatus.AVAILABLE
@@ -160,8 +169,7 @@ def evaluate_candidates(problem: SchedulingProblem) -> CandidateAudit:
                 if cohort.strip()
             )
             if recommended and not any(
-                _cohort_matches(constraints.recommended_cohort, value)
-                for value in recommended
+                _cohort_matches(constraints.recommended_cohort, value) for value in recommended
             ):
                 soft.append(
                     RejectionReason(

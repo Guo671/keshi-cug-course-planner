@@ -26,6 +26,7 @@ from ..domain import (
     UserConstraints,
     WeekMask,
 )
+from ..domain.section_identity import needs_component_review
 from ..infrastructure.tables import (
     CatalogCourse,
     CatalogSection,
@@ -34,6 +35,7 @@ from ..infrastructure.tables import (
 )
 from ..scheduling import ScheduleSolver, SolverConfig
 from .catalog_state import catalog_fingerprint
+from .course_policy import effective_precision, needs_confirmation
 
 
 class PlanningInputError(ValueError):
@@ -48,22 +50,18 @@ def generate_schedule(
     resolved_choices: list[CourseChoice] | None = None,
     additional_warnings: list[str] | None = None,
 ) -> dict[str, Any]:
-    """Generate, verify and persist one planning run.
+    """Generate, independently verify and persist a course-list planning run."""
 
-    ``resolved_choices`` is supplied by the curriculum service for curriculum
-    mode.  In mixed mode the UI's edited manual list is authoritative: this is
-    what makes removal of a curriculum course a real edit rather than having
-    the server silently add it back.
-    """
-
-    choices = _deduplicate_choices(resolved_choices or payload.manual_courses)
+    choices = _deduplicate_choices(
+        resolved_choices if resolved_choices is not None else payload.manual_courses
+    )
     if not choices:
-        raise PlanningInputError("没有可排课程；请先载入培养方案或手动添加课程")
+        raise PlanningInputError("没有可排课程；请先导入课表或手动添加课程")
     if (
         payload.preferences.phase == "retake"
         and not payload.preferences.retake_eligibility_confirmed
     ):
-        raise PlanningInputError("重修选课仅适用于不及格或缓考课程；请先确认本人具备重修资格")
+        raise PlanningInputError("请先确认本人符合所在学校的重修资格")
 
     course_ids = [choice.course_id for choice in choices]
     catalog_courses = list(
@@ -74,9 +72,49 @@ def generate_schedule(
         ).unique()
     )
     by_id = {course.id: course for course in catalog_courses}
+    for choice in choices:
+        if choice.custom is not None:
+            if not choice.course_id.startswith("custom:"):
+                raise PlanningInputError("自填课程标识必须以 custom: 开头")
+            custom = choice.custom
+            by_id[choice.course_id] = CatalogCourse(
+                id=choice.course_id,
+                code=custom.code or "自填",
+                name=custom.name,
+                sections=[
+                    CatalogSection(
+                        id=f"{choice.course_id}:{section.id}",
+                        course_id=choice.course_id,
+                        section_code=section.section_code,
+                        display_name=section.section_code,
+                        instructors=section.instructors,
+                        composition=[],
+                        import_issues=[],
+                        needs_confirmation=False,
+                        default_eligible=True,
+                        source_snapshot_id="custom",
+                        parse_confidence=1.0,
+                        meetings=[
+                            {
+                                **m.model_dump(),
+                                "precision": "non_blocking" if m.non_blocking else "exact_slot",
+                            }
+                            for m in section.meetings
+                        ],
+                    )
+                    for section in custom.sections
+                ],
+            )
     unknown_ids = [course_id for course_id in course_ids if course_id not in by_id]
     if unknown_ids:
         raise PlanningInputError("以下课程不在已导入课程总库中：" + "、".join(unknown_ids))
+    codes: set[str] = set()
+    for course in by_id.values():
+        code = course.code.strip().casefold()
+        if code and code != "自填":
+            if code in codes:
+                raise PlanningInputError(f"课程号 {course.code} 重复，请合并为一门课的备选教学班")
+            codes.add(code)
 
     warnings: list[str] = list(additional_warnings or [])
     profile_preferences = (
@@ -84,13 +122,17 @@ def generate_schedule(
         if user.profile and isinstance(user.profile.preferences, dict)
         else {}
     )
-    administrative_class = str(
-        profile_preferences.get("administrative_class") or ""
-    ).strip()
-    if user.profile and user.profile.cohort_year == 2024:
+    administrative_class = str(profile_preferences.get("administrative_class") or "").strip()
+    if (
+        user.profile
+        and user.profile.cohort_year == 2024
+        and profile_preferences.get("target_year", 2026) == 2026
+        and profile_preferences.get("target_season", "fall") == "fall"
+        and profile_preferences.get("school") in {"中国地质大学（武汉）", "中国地质大学(武汉)"}
+    ):
         warnings.append(
             "2026 年秋季选课规则特别提醒：2024 级本科生须在教务系统选择“社会调查”。"
-            "当前课程总库未按该名称匹配到可排教学班，本软件不会把它静默视为已完成。"
+            "请核对是否已加入待排课程及是否完成教务系统选课。"
         )
     domain_courses: list[Course] = []
     requests: list[CourseRequest] = []
@@ -101,6 +143,15 @@ def generate_schedule(
 
     for choice in choices:
         catalog_course = by_id[choice.course_id]
+        if (choice.custom and not choice.custom.component_relationship_confirmed) or (
+            choice.custom is None
+            and needs_component_review(s.section_code for s in catalog_course.sections)
+        ):
+            raise PlanningInputError(
+                f"{catalog_course.name} 含 A/B 等后缀教学班，尚未确认理论、实验组成关系。"
+                "请点“修改课程”，将必须同时参加的教学班合并为一组，"
+                "确认各组是完整备选后保存。"
+            )
         availability = _course_availability(catalog_course)
         domain_courses.append(
             Course(
@@ -115,7 +166,7 @@ def generate_schedule(
         requests.append(
             CourseRequest(
                 course_id=catalog_course.id,
-                priority=choice.priority,
+                priority=choice.priority + sum(c.priority for c in choices) + 1,
                 required=choice.required,
             )
         )
@@ -128,7 +179,7 @@ def generate_schedule(
             is_old_only = _is_old_only_section(row)
             has_unknown_time = _section_has_unknown_time(row)
             if (
-                row.needs_confirmation
+                needs_confirmation(row)
                 and not is_old_only
                 and not has_unknown_time
                 and availability is AvailabilityStatus.AVAILABLE
@@ -179,6 +230,12 @@ def generate_schedule(
     result = solver.solve(problem)
     current_catalog_fingerprint = catalog_fingerprint(db)
     response = _serialize_result(result, problem, by_id, warnings, current_catalog_fingerprint)
+    if result.status.value not in {"data_error", "unknown"} and not any(
+        not plan.unscheduled_course_ids for plan in result.plans
+    ):
+        from ..scheduling.adjustments import suggest_adjustment
+
+        response["adjustment"] = suggest_adjustment(problem)
     run_id = str(uuid4())
     response["run_id"] = run_id
     db.add(
@@ -202,10 +259,11 @@ def _deduplicate_choices(choices: list[CourseChoice]) -> list[CourseChoice]:
         if existing is None:
             result[choice.course_id] = choice
             continue
-        # Duplicate curriculum/manual entries merge conservatively: required
+        # Duplicate course entries merge conservatively: required
         # and explicit data-risk opt-ins are never silently discarded.
         result[choice.course_id] = CourseChoice(
             course_id=choice.course_id,
+            custom=choice.custom or existing.custom,
             priority=max(existing.priority, choice.priority),
             required=existing.required or choice.required,
             locked_section_id=choice.locked_section_id or existing.locked_section_id,
@@ -220,7 +278,7 @@ def _deduplicate_choices(choices: list[CourseChoice]) -> list[CourseChoice]:
 def _course_availability(course: CatalogCourse) -> AvailabilityStatus:
     if any(
         not _is_old_only_section(section)
-        and (not section.needs_confirmation or _section_has_unknown_time(section))
+        and (not needs_confirmation(section) or _section_has_unknown_time(section))
         for section in course.sections
     ):
         return AvailabilityStatus.AVAILABLE
@@ -257,7 +315,9 @@ def _section_to_option(section: CatalogSection) -> tuple[SectionOption, list[str
     warnings: list[str] = []
     meetings: list[Meeting] = []
     for index, raw in enumerate(section.meetings):
-        meeting, warning = _parse_meeting(raw, section, index)
+        meeting, warning = _parse_meeting(
+            {**raw, "precision": effective_precision(raw, section.import_issues)}, section, index
+        )
         meetings.append(meeting)
         if warning:
             warnings.append(warning)
@@ -287,7 +347,7 @@ def _section_to_option(section: CatalogSection) -> tuple[SectionOption, list[str
             course_id=section.course_id,
             sections=(teaching_section,),
             label=section.display_name,
-            requires_confirmation=section.needs_confirmation,
+            requires_confirmation=needs_confirmation(section),
         ),
         warnings,
     )
@@ -391,7 +451,7 @@ def _build_constraints(
                     weekday=weekday,
                     start_period=1,
                     end_period=2,
-                    weeks=WeekMask.all(21),
+                    weeks=WeekMask.all(64),
                     strength=ConstraintStrength.SOFT,
                     penalty=25,
                     label="尽量不要早课",
@@ -405,7 +465,7 @@ def _build_constraints(
                     weekday=weekday,
                     start_period=9,
                     end_period=20,
-                    weeks=WeekMask.all(21),
+                    weeks=WeekMask.all(64),
                     strength=ConstraintStrength.SOFT,
                     penalty=25,
                     label="尽量不要晚课",
@@ -482,6 +542,11 @@ def _serialize_result(
                     "section_names": [row.display_name for row in selected_catalog_rows],
                     "instructors": list(option.instructors),
                     "composition": compositions,
+                    "non_blocking_weeks": [
+                        list(m.weeks.weeks)
+                        for m in option.meetings
+                        if m.precision is TimePrecision.NON_BLOCKING
+                    ],
                 }
             )
             recommended_cohort = problem.constraints.recommended_cohort
@@ -501,7 +566,7 @@ def _serialize_result(
                     f"{course.code} {course.name} 仅来自旧版快照，必须在教务系统再次确认"
                 )
             if any(
-                row.needs_confirmation and not _is_old_only_section(row)
+                needs_confirmation(row) and not _is_old_only_section(row)
                 for row in selected_catalog_rows
             ):
                 plan_warnings.append(
@@ -510,7 +575,7 @@ def _serialize_result(
                 )
             for meeting in option.meetings:
                 if not meeting.is_exact:
-                    if meeting.precision is not TimePrecision.ASYNC:
+                    if meeting.precision not in {TimePrecision.ASYNC, TimePrecision.NON_BLOCKING}:
                         plan_warnings.append(
                             f"{course.code} {course.name} 含“{meeting.precision.value}”时间，"
                             "未证明与其他课程无冲突"
@@ -587,11 +652,13 @@ def _cohort_value_matches(expected: str, registered: str) -> bool:
 
 
 def _phase_warning(phase: SelectionPhase) -> str:
+    if phase is SelectionPhase.PLANNING:
+        return "当前为通用排课模式；选课资格和实际提交结果请按所在学校的规定核对。"
     if phase is SelectionPhase.PRESELECTION:
         return "当前按预选阶段解释：可超容量提交但并非先到先得，筛选后仍可能被随机移除。"
     if phase is SelectionPhase.RETAKE:
         return (
-            "当前按重修阶段解释：仅不及格或缓考课程具备资格；"
+            "当前按重修阶段解释：请核对所在学校的重修资格；"
             "软件仍不自动允许时间冲突，冲突免听须按学校流程另行申请。"
         )
     if phase is SelectionPhase.ADD_DROP:

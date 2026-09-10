@@ -53,7 +53,6 @@ def test_settings_honor_every_frozen_runtime_override(tmp_path: Path) -> None:
         "CUG_PLANNER_DATABASE_URL": f"sqlite:///{database_path.as_posix()}",
         "CUG_PLANNER_STATIC_DIR": str(resource_root / "site"),
         "CUG_PLANNER_CATALOG_DIR": str(resource_root / "catalog-data"),
-        "CUG_PLANNER_CURRICULUM_REGISTRY_PATH": str(resource_root / "plans.json"),
         "CUG_PLANNER_SESSION_HOURS": "24",
     }
 
@@ -62,7 +61,6 @@ def test_settings_honor_every_frozen_runtime_override(tmp_path: Path) -> None:
     assert configured.database_url == values["CUG_PLANNER_DATABASE_URL"]
     assert configured.static_dir == resource_root / "site"
     assert configured.catalog_dir == resource_root / "catalog-data"
-    assert configured.curriculum_registry_path == resource_root / "plans.json"
     assert configured.session_hours == 24
 
 

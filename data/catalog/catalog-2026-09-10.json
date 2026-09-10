@@ -1,0 +1,13 @@
+{
+  "scope_label": "中国地质大学（武汉） · 2026年秋季",
+  "file_count": 1212,
+  "courses": 1212,
+  "sections": 3318,
+  "fully_exact_sections": 3070,
+  "sections_with_non_blocking_records": 248,
+  "mixed_exact_and_non_blocking_sections": 40,
+  "only_non_blocking_sections": 208,
+  "exact_meetings": 9405,
+  "non_blocking_meetings": 315,
+  "policy": "仅缺少具体星期和节次的实践记录不占时段；已有精确时段仍检查冲突"
+}

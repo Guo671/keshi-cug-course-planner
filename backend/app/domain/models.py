@@ -16,6 +16,7 @@ from .week_mask import WeekMask
 
 
 class TimePrecision(StrEnum):
+    NON_BLOCKING = "non_blocking"
     EXACT_SLOT = "exact_slot"
     DATE_RANGE = "date_range"
     WEEK_ONLY = "week_only"
@@ -27,7 +28,7 @@ class AvailabilityStatus(StrEnum):
     """Whether catalog evidence is strong enough to schedule a course.
 
     ``NEEDS_CONFIRMATION`` is the default status for courses seen only in an
-    older curriculum version.  Strategy A keeps both non-available statuses
+    older catalog snapshot.  Strategy A keeps both non-available statuses
     out of candidate generation until the user explicitly confirms them.
     """
 

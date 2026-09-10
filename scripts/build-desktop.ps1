@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [switch]$SkipTests,
-    [switch]$SkipInstall
+    [switch]$SkipInstall,
+    [string]$SeedSource
 )
 
 $ErrorActionPreference = 'Stop'
@@ -14,12 +15,13 @@ $SeedDatabase = Join-Path $DesktopBuildRoot 'seed\planner.db'
 # Windows PowerShell 5.1 reads BOM-less scripts as the active ANSI code page.
 # Build the Chinese product name from Unicode code points so this script remains ASCII-safe.
 $ProductName = [string][char]0x8BFE + [string][char]0x77F3
-$BundleName = "$ProductName-v0.2.0-win64"
-$ReleaseFileName = 'keshi-v0.2.0-win64.zip'
+$BundleName = "$ProductName-v0.3.1-win64"
+$ReleaseFileName = 'keshi-v0.3.1-win64.zip'
 $BundleDir = Join-Path $DistRoot $BundleName
 $ReleaseDir = Join-Path $ProjectRoot 'release'
 $ZipPath = Join-Path $ReleaseDir $ReleaseFileName
 $SmokeRoot = $null
+if (-not $SeedSource) { $SeedSource = Join-Path $ProjectRoot 'var\planner.db' }
 
 function Invoke-Checked {
     param(
@@ -73,7 +75,7 @@ try {
     }
     Invoke-Checked 'Preparing privacy-checked seed database' {
         & $Python (Join-Path $ProjectRoot 'desktop\tools\prepare_seed.py') `
-            (Join-Path $ProjectRoot 'var\planner.db') $SeedDatabase
+            $SeedSource $SeedDatabase
     }
 
     if (-not $SkipTests) {
@@ -105,7 +107,7 @@ try {
         throw "Missing frozen executable: $ExePath"
     }
     $VersionOutput = & $ExePath --version
-    if ($LASTEXITCODE -ne 0 -or ($VersionOutput -join '').Trim() -ne 'Keshi 0.2.0') {
+    if ($LASTEXITCODE -ne 0 -or ($VersionOutput -join '').Trim() -ne 'Keshi 0.3.1') {
         throw "Frozen version check failed: $VersionOutput"
     }
 

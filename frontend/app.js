@@ -11,13 +11,16 @@ const state = {
   courseDetailRequests: new Map(),
   blockedTimes: [],
   instructorRules: [],
-  curriculumPreview: null,
   planResponse: null,
   historyRuns: [],
   currentResultMeta: null,
   draftRestoreInProgress: false,
   draftSaveTimer: null,
   draftWriteBlocked: false,
+  viewWeek: 0,
+  currentPlanIndex: 0,
+  searchRequestId: 0,
+  resultRequestId: 0,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -33,21 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function bindEvents() {
+  bindExtendedCourseEvents();
   $$('[data-auth-mode]').forEach((button) => button.addEventListener("click", () => setAuthMode(button.dataset.authMode)));
   $("#auth-form").addEventListener("submit", submitAuth);
   $("#logout-button").addEventListener("click", logout);
   $("#profile-form").addEventListener("submit", saveProfile);
   $("#profile-cohort").addEventListener("change", updateSemesterNote);
   $("#selection-phase").addEventListener("change", updateRetakeConfirmation);
-  $$('input[name="input-mode"]').forEach((input) => input.addEventListener("change", setInputMode));
   $("#course-search-button").addEventListener("click", searchCourses);
   $("#course-search").addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); searchCourses(); } });
   $("#clear-courses").addEventListener("click", () => { state.selectedCourses.clear(); renderSelectedCourses(); scheduleDraftSave(); });
   $("#blocked-time-form").addEventListener("submit", addBlockedTime);
   $("#teacher-rule-form").addEventListener("submit", addTeacherRule);
-  $("#refresh-curriculum").addEventListener("click", matchCurriculum);
-  $("#import-curriculum").addEventListener("click", importCurriculumCourses);
-  $("#include-optional").addEventListener("change", toggleOptionalCurriculumCourses);
   $("#generate-plan").addEventListener("click", generatePlan);
   $("#refresh-history").addEventListener("click", loadPlanningHistory);
   document.addEventListener("click", handleDelegatedClick);
@@ -55,24 +55,37 @@ function bindEvents() {
   document.addEventListener("keydown", handleDelegatedKeydown);
 }
 
+let activeApiRequests = 0;
+const apiWaiters = [];
 async function api(path, options = {}) {
-  const headers = { ...(options.body ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) };
-  if (state.token) headers.Authorization = `Bearer ${state.token}`;
-  const response = await fetch(path, { ...options, headers });
-  if (response.status === 401 && !path.includes("/auth/")) {
-    clearSession();
-    showAuth();
-    throw new Error("登录已失效，请重新登录");
+  const issuedToken = state.token;
+  if (activeApiRequests >= 6) await new Promise(resolve => apiWaiters.push(resolve));
+  else activeApiRequests++;
+  const assertSession = () => {
+    if (state.token !== issuedToken) { const error = new Error("旧登录的请求已失效"); error.staleSession = true; throw error; }
+  };
+  try {
+    assertSession();
+    const headers = { ...(options.body && !(options.body instanceof FormData) ? { "Content-Type": "application/json" } : {}), ...(options.headers || {}) };
+    if (issuedToken) headers.Authorization = `Bearer ${issuedToken}`;
+    const response = await fetch(path, { ...options, headers });
+    assertSession();
+    if (response.status === 401 && !path.includes("/auth/")) {
+      clearSession(); showAuth();
+      throw new Error("登录已失效，请重新登录");
+    }
+    const body = response.status === 204 ? null : await response.json().catch(() => null);
+    assertSession();
+    if (!response.ok) {
+      const detail = body?.detail;
+      const message = typeof detail === "string" ? detail : Array.isArray(detail) ? detail.map((item) => item.msg).join("；") : `请求失败（${response.status}）`;
+      const error = new Error(message); error.status = response.status; throw error;
+    }
+    return body;
+  } finally {
+    const next = apiWaiters.shift();
+    if (next) next(); else activeApiRequests--;
   }
-  const body = response.status === 204 ? null : await response.json().catch(() => null);
-  if (!response.ok) {
-    const detail = body?.detail;
-    const message = typeof detail === "string" ? detail : Array.isArray(detail) ? detail.map((item) => item.msg).join("；") : `请求失败（${response.status}）`;
-    const error = new Error(message);
-    error.status = response.status;
-    throw error;
-  }
-  return body;
 }
 
 function setAuthMode(mode) {
@@ -138,6 +151,7 @@ async function submitAuth(event) {
     localStorage.setItem("cugPlannerToken", state.token);
     await bootstrapApp();
   } catch (error) {
+    if (error.staleSession) return;
     $("#auth-error").textContent = error.message;
   } finally {
     button.disabled = false;
@@ -153,6 +167,7 @@ async function bootstrapApp() {
     $("#auth-screen").classList.add("hidden");
     $("#app-shell").classList.remove("hidden");
   } catch (error) {
+    if (error.staleSession) return;
     if (!state.token) return;
     toast(error.message, true);
   }
@@ -180,6 +195,15 @@ function clearSession() {
 }
 
 function resetUserState() {
+  state.searchRequestId++;
+  state.resultRequestId++;
+  $("#generate-plan").disabled = false;
+  $("#plan-progress").classList.add('hidden');
+  $("#adjustment-results").innerHTML = '';
+  $("#more-plans").classList.add('hidden');
+  $("#course-editor").close();
+  $("#custom-sections").innerHTML = '';
+  for (const selector of ['#auth-password','#auth-username','#custom-name','#custom-code','#catalog-files','#direct-course-files']) $(selector).value = '';
   clearTimeout(state.draftSaveTimer);
   state.profile = null;
   state.catalog = null;
@@ -189,7 +213,6 @@ function resetUserState() {
   state.courseDetailRequests = new Map();
   state.blockedTimes = [];
   state.instructorRules = [];
-  state.curriculumPreview = null;
   state.planResponse = null;
   state.historyRuns = [];
   state.currentResultMeta = null;
@@ -202,18 +225,9 @@ function resetUserState() {
   $("#current-user").textContent = "";
   $("#course-search").value = "";
   $("#course-search-results").innerHTML = '<div class="empty-state compact"><span>⌕</span><p>输入课程名称或课程号开始搜索</p></div>';
-  $("#curriculum-course-list").innerHTML = "";
-  $("#curriculum-evidence").textContent = "请先保存学生信息。";
-  $("#curriculum-status").textContent = "等待匹配";
-  $("#curriculum-status").className = "badge neutral";
-  $("#curriculum-panel").classList.add("hidden");
-  $("#confirm-semester").checked = false;
-  $("#include-optional").checked = false;
   $("#retake-confirm").checked = false;
   $("#retake-confirm-row").classList.add("hidden");
-  $("#selection-phase").value = "confirmation";
-  $$('input[name="input-mode"]').forEach((input) => { input.checked = input.value === "manual"; });
-  $$(".mode-card").forEach((card) => card.classList.toggle("active", card.querySelector('input[value="manual"]') !== null));
+  $("#selection-phase").value = "planning";
   updateInputModeUi();
   renderSelectedCourses();
   renderRules();
@@ -231,6 +245,7 @@ async function loadProfile() {
     fillProfileForm();
     setProfileComplete(true);
   } catch (error) {
+    if (error.staleSession) return;
     if (error.message.includes("尚未填写")) {
       state.profile = null;
       $("#profile-form").reset();
@@ -243,15 +258,16 @@ async function loadProfile() {
 function fillProfileForm() {
   const profile = state.profile;
   if (!profile) return;
+  $("#profile-school").value = profile.school === "未填写学校" ? "" : (profile.school || "");
   $("#profile-college").value = profile.college;
   $("#profile-major").value = profile.major;
   $("#profile-cohort").value = String(profile.cohort_year);
-  $("#profile-variant").value = profile.plan_variant || "";
-  $("#profile-major-code").value = profile.major_code || "";
+  $("#target-year").value = String(profile.target_year || 2026);
+  $("#target-season").value = profile.target_season || "fall";
   $("#profile-administrative-class").value = profile.administrative_class || "";
-  $("#profile-cooperation").value = profile.cooperation_program || "无";
   $("#profile-semester").value = profile.semester_override ? String(profile.semester_override) : "";
   updateSemesterNote();
+  updateTermBadge();
 }
 
 function setProfileComplete(complete) {
@@ -264,253 +280,69 @@ function setProfileComplete(complete) {
       .filter((child) => !child.classList.contains("section-heading") && !child.classList.contains("lock-note"))
       .forEach((child) => { child.inert = !complete; });
   });
-  if (complete) matchCurriculum();
 }
 
 async function saveProfile(event) {
   event.preventDefault();
   $("#profile-error").textContent = "";
   const payload = {
+    school: $("#profile-school").value.trim() || "未填写学校",
     college: $("#profile-college").value,
     major: $("#profile-major").value,
     cohort_year: Number($("#profile-cohort").value),
-    plan_variant: $("#profile-variant").value || null,
-    major_code: $("#profile-major-code").value || null,
+    target_year: Number($("#target-year").value),
+    target_season: $("#target-season").value,
     administrative_class: $("#profile-administrative-class").value.trim() || null,
-    cooperation_program: $("#profile-cooperation").value,
     semester_override: $("#profile-semester").value ? Number($("#profile-semester").value) : null,
   };
   try {
     state.profile = await api("/api/profile", { method: "PUT", body: JSON.stringify(payload) });
     setProfileComplete(true);
     updateSemesterNote();
+    updateTermBadge();
     toast("学生信息已保存");
-  } catch (error) { $("#profile-error").textContent = error.message; }
+  } catch (error) {
+    if (error.staleSession) return; $("#profile-error").textContent = error.message; }
 }
 
 function updateSemesterNote() {
   const cohort = Number($("#profile-cohort").value);
   if (!cohort) return;
-  const inferred = 2 * (2026 - cohort) + 1;
+  const year = Number($("#target-year").value) || 2026;
+  const season = $("#target-season").value;
+  const inferred = 2 * (year - cohort) + (season === "fall" ? 1 : 0);
   const override = Number($("#profile-semester").value) || inferred;
-  $("#semester-note").textContent = `2026 秋季按年级推算为第 ${inferred} 学期；当前采用第 ${override} 学期。转专业、休学或留级时请修正。`;
+  $("#semester-note").textContent = `${year} ${season === "fall" ? "秋" : "春"}季按年级推算为第 ${inferred} 学期；当前采用第 ${override} 学期。转专业、休学或留级时请修正。`;
 }
 
 async function loadCatalogStatus() {
   try {
     state.catalog = await api("/api/catalog/status");
+    $("#catalog-scope-label").textContent = state.catalog.source_label || "请核对当前总库的学校与学期；可在总库管理中替换。";
     const node = $("#catalog-mini-status");
     const dot = node.querySelector(".status-dot");
     dot.className = `status-dot ${state.catalog.ready ? "" : "error"}`;
     node.querySelector("strong").textContent = state.catalog.ready ? `${state.catalog.course_count} 门课程` : "课程库未就绪";
     node.querySelector("small").textContent = state.catalog.ready
-      ? `${state.catalog.primary_section_count} 个可靠候选；${state.catalog.confirmation_required_count} 个需确认`
+      ? `${state.catalog.primary_section_count - (state.catalog.non_blocking_section_count || 0)} 个时段完整；${state.catalog.non_blocking_section_count || 0} 个含不占时段记录（其中 ${state.catalog.mixed_time_section_count || 0} 个也有精确时段）；${state.catalog.confirmation_required_count} 个待核对`
       : state.catalog.warning;
-  } catch (error) { toast(error.message, true); }
-}
-
-function setInputMode(event) {
-  state.inputMode = event.target.value;
-  $$(".mode-card").forEach((card) => card.classList.toggle("active", card.contains(event.target)));
-  updateInputModeUi();
-  if (state.inputMode !== "manual") matchCurriculum();
-  else if (state.curriculumPreview) renderCurriculumCourseList();
-  scheduleDraftSave();
+  } catch (error) {
+    if (error.staleSession) return; toast(error.message, true); }
 }
 
 function updateInputModeUi() {
-  const isManual = state.inputMode === "manual";
-  const isPureCurriculum = state.inputMode === "curriculum";
-  $("#curriculum-panel").classList.toggle("hidden", isManual);
-  $("#optional-courses-row").classList.toggle("hidden", state.inputMode !== "mixed");
-  $("#pure-curriculum-note").classList.toggle("hidden", !isPureCurriculum);
-  $("#import-curriculum").classList.toggle("hidden", isPureCurriculum);
-  $("#manual-course-workspace").classList.toggle("hidden", isPureCurriculum);
-  if (isPureCurriculum) {
-    const safeCount = (state.curriculumPreview?.courses || []).filter(isSafeRequiredCurriculumCourse).length;
-    $("#course-count").textContent = `${safeCount} 门自动候选`;
-  } else {
-    $("#course-count").textContent = `${state.selectedCourses.size} 门`;
-  }
-}
-
-async function matchCurriculum() {
-  if (!state.profile) return;
-  const params = new URLSearchParams({
-    college: state.profile.college,
-    major: state.profile.major,
-    cohort_year: state.profile.cohort_year,
-    semester: state.profile.semester,
-  });
-  if (state.profile.plan_variant) params.set("plan_variant", state.profile.plan_variant);
-  try {
-    state.curriculumPreview = await api(`/api/curricula/preview?${params}`);
-    renderCurriculumEvidence();
-  } catch (error) {
-    state.curriculumPreview = null;
-    $("#curriculum-status").textContent = "无法读取";
-    $("#curriculum-status").className = "badge danger";
-    $("#curriculum-evidence").textContent = error.message;
-    $("#import-curriculum").disabled = true;
-    $("#curriculum-course-list").innerHTML = "";
-  }
-}
-
-function renderCurriculumEvidence() {
-  const preview = state.curriculumPreview;
-  if (!preview || preview.manual_only) {
-    $("#curriculum-status").textContent = "仅支持手动输入";
-    $("#curriculum-status").className = "badge warning";
-    $("#curriculum-evidence").innerHTML = `<strong>尚未找到可直接导入的最新官方培养方案。</strong><br>${escapeHtml(preview?.warnings?.join("；") || "请使用手动输入方式。")}`;
-    $("#import-curriculum").disabled = true;
-    $("#curriculum-course-list").innerHTML = "";
-    state.inputMode = "manual";
-    $$('input[name="input-mode"]').forEach((input) => {
-      input.disabled = input.value !== "manual";
-      input.checked = input.value === "manual";
-    });
-    $$(".mode-card").forEach((card) => {
-      card.classList.toggle("active", card.querySelector('input[value="manual"]') !== null);
-    });
-    updateInputModeUi();
-    $("#curriculum-panel").classList.remove("hidden");
-    $("#optional-courses-row").classList.add("hidden");
-    $("#import-curriculum").classList.add("hidden");
-    return;
-  }
-  $$('input[name="input-mode"]').forEach((input) => { input.disabled = false; });
-  const source = preview.source;
-  const hasDirectionChoice = preview.courses.some((course) => course.requirement_type === "track_choice");
-  const safeCount = preview.courses.filter(isSafeRequiredCurriculumCourse).length;
-  const pureHasOmissions = state.inputMode === "curriculum" && preview.courses.some((course) => !isSafeRequiredCurriculumCourse(course));
-  $("#curriculum-status").textContent = state.inputMode === "curriculum"
-    ? `${safeCount} 门安全必修`
-    : `${preview.courses.length} 门可核对`;
-  $("#curriculum-status").className = `badge ${pureHasOmissions ? "warning" : "success"}`;
-  const choiceNotice = hasDirectionChoice
-    ? "<br><strong>包含方向课程组；纯模式不会代替你选择，混合方式可自行选定。</strong>"
-    : "";
-  $("#curriculum-evidence").innerHTML = `<strong>${escapeHtml(source.major)} · 第 ${preview.semester} 学期</strong><br>状态：${escapeHtml(source.status)}；官网核验日期：${escapeHtml(source.checked_at || "未记录")}。${source.official_url ? `<a href="${escapeAttribute(source.official_url)}" target="_blank" rel="noreferrer">查看官方来源</a>` : ""}<br>${preview.warnings.map(escapeHtml).join("；")}${choiceNotice}`;
-  $("#import-curriculum").disabled = preview.courses.length === 0;
-  updateInputModeUi();
-  renderCurriculumCourseList();
-}
-
-function isSafeRequiredCurriculumCourse(course) {
-  return Boolean(course.required && course.matched_course_id && Number(course.eligible_section_count || 0) > 0);
-}
-
-async function importCurriculumCourses() {
-  if (state.inputMode !== "mixed") return;
-  if (!$("#confirm-semester").checked) return toast("请先确认实际所在学期", true);
-  const checkedIndexes = new Set(
-    $$("[data-curriculum-index]:checked").map((input) => Number(input.dataset.curriculumIndex))
-  );
-  const courses = (state.curriculumPreview?.courses || []).filter((_, index) => checkedIndexes.has(index));
-  const groups = new Set(
-    (state.curriculumPreview?.courses || [])
-      .filter((course) => course.requirement_type === "track_choice")
-      .map((course) => course.selection_group || "未命名方向组")
-  );
-  for (const group of groups) {
-    const chosen = courses.some(
-      (course) => course.requirement_type === "track_choice"
-        && (course.selection_group || "未命名方向组") === group
-    );
-    if (!chosen) return toast(`请选择方向课程组“${group}”中的一个方向`, true);
-  }
-  const importedIds = [];
-  courses.forEach((course) => {
-    if (!course.matched_course_id) return;
-    const normalized = normalizeCourseSummary({
-      id: course.matched_course_id, code: course.code, name: course.name,
-      credits: course.credits, required: course.required, priority: course.required ? 200 : 80,
-      allow_confirmation_required: false, allow_unknown_time: false, locked_section_id: null,
-      forbidden_section_ids: [],
-      section_count: course.section_count,
-      confirmation_required_section_count: course.confirmation_required_section_count,
-      legacy_only_section_count: course.legacy_only_section_count,
-      data_quality_confirmation_section_count: course.data_quality_confirmation_section_count,
-      unknown_time_section_count: course.unknown_time_section_count,
-    });
-    state.selectedCourses.set(course.matched_course_id, normalized);
-    importedIds.push(course.matched_course_id);
-  });
-  renderSelectedCourses();
-  scheduleDraftSave();
-  toast(`已载入 ${importedIds.length} 门已匹配课程，正在读取教学班详情`);
-  await Promise.allSettled(importedIds.map((courseId) => ensureCourseDetail(courseId)));
-}
-
-function renderCurriculumCourseList() {
-  const container = $("#curriculum-course-list");
-  const courses = state.curriculumPreview?.courses || [];
-  if (!courses.length) {
-    container.innerHTML = "";
-    return;
-  }
-  const isPureCurriculum = state.inputMode === "curriculum";
-  const groupRules = new Map();
-  courses.forEach((course) => {
-    if (course.requirement_type === "track_choice") {
-      groupRules.set(
-        course.selection_group || "未命名方向组",
-        course.selection_rule || "该方向组需要做出选择"
-      );
-    }
-  });
-  const rows = [...groupRules].map(
-    ([group, rule]) => `<div class="curriculum-group-note"><strong>${escapeHtml(group)}</strong>：${escapeHtml(rule)}</div>`
-  );
-  courses.forEach((course, index) => {
-    const isRequired = course.required;
-    const isChoice = course.requirement_type === "track_choice";
-    const inputType = isChoice ? "radio" : "checkbox";
-    const inputName = isChoice
-      ? `curriculum-group-${course.selection_group || "unnamed"}`
-      : `curriculum-${index}`;
-    const checked = isRequired ? "checked" : "";
-    const disabled = isPureCurriculum || !course.matched_course_id
-      ? "disabled" : "";
-    const tag = isRequired ? "必修" : isChoice ? "方向选择" : "选修候选";
-    const tagClass = isRequired ? "required" : isChoice ? "choice" : "";
-    if (isPureCurriculum) {
-      let status = "不会自动提交";
-      let statusClass = "choice";
-      if (isSafeRequiredCurriculumCourse(course)) {
-        status = "将自动提交";
-        statusClass = "required";
-      } else if (course.required && !course.matched_course_id) {
-        status = "未匹配 · 结果持续提示";
-      } else if (course.required && Number(course.eligible_section_count || 0) === 0) {
-        status = "仅有风险班 · 结果持续提示";
-      } else if (isChoice) {
-        status = "方向待选 · 改用混合方式";
-      }
-      rows.push(`<div class="curriculum-course-row curriculum-course-readonly"><span class="course-code">${escapeHtml(course.code)}</span><strong title="${escapeAttribute(course.name)}">${escapeHtml(course.name)}</strong><span class="requirement-tag ${statusClass}">${escapeHtml(status)}</span></div>`);
-      return;
-    }
-    rows.push(`<label class="curriculum-course-row"><input type="${inputType}" name="${escapeAttribute(inputName)}" data-curriculum-index="${index}" ${checked} ${disabled}/><span class="course-code">${escapeHtml(course.code)}</span><strong title="${escapeAttribute(course.name)}">${escapeHtml(course.name)}</strong><span class="requirement-tag ${tagClass}">${tag}${course.matched_course_id ? "" : " · 未匹配"}</span></label>`);
-  });
-  container.innerHTML = rows.join("");
-}
-
-function toggleOptionalCurriculumCourses() {
-  if (state.inputMode !== "mixed") return;
-  const enabled = $("#include-optional").checked;
-  $$("#curriculum-course-list input[type='checkbox']").forEach((input) => {
-    const course = state.curriculumPreview?.courses?.[Number(input.dataset.curriculumIndex)];
-    if (course && !course.required && !input.disabled) input.checked = enabled;
-  });
+  $("#course-count").textContent = `${state.selectedCourses.size} 门`;
 }
 
 async function searchCourses() {
+  const requestId = ++state.searchRequestId;
   const query = $("#course-search").value.trim();
   if (!query) return toast("请输入课程名称或课程号", true);
   const container = $("#course-search-results");
   container.innerHTML = '<div class="empty-state compact"><span class="spinner"></span><p>搜索中…</p></div>';
   try {
     const results = await api(`/api/catalog/search?q=${encodeURIComponent(query)}`);
+    if (requestId !== state.searchRequestId) return;
     if (!results.length) {
       container.innerHTML = '<div class="empty-state compact"><span>∅</span><p>没有匹配课程</p><small>请检查课程号，或尝试较短的课程名称。</small></div>';
       return;
@@ -522,10 +354,13 @@ async function searchCourses() {
       <button class="icon-button" data-add-course="${escapeAttribute(course.id)}" aria-label="添加 ${escapeAttribute(course.name)}">＋</button>
     </div>`).join("");
     container._courseResults = normalizedResults;
-  } catch (error) { container.innerHTML = `<p class="form-error">${escapeHtml(error.message)}</p>`; }
+  } catch (error) {
+    if (error.staleSession || requestId !== state.searchRequestId) return; container.innerHTML = `<p class="form-error">${escapeHtml(error.message)}</p>`; }
 }
 
 function handleDelegatedClick(event) {
+  const editCourse = event.target.closest("[data-edit-course]");
+  if (editCourse) { void openCourseEditor(editCourse.dataset.editCourse); return; }
   const replaceDraftButton = event.target.closest("[data-replace-draft]");
   if (replaceDraftButton) {
     state.draftWriteBlocked = false;
@@ -635,6 +470,11 @@ function handleDelegatedKeydown(event) {
 }
 
 function handleDelegatedChange(event) {
+  if (event.target.matches('[data-view-week]')) {
+    state.viewWeek = Number(event.target.value);
+    renderPlanAt(state.currentPlanIndex);
+    return;
+  }
   const card = event.target.closest("[data-course-id]");
   const course = card ? state.selectedCourses.get(card.dataset.courseId) : null;
   let changed = false;
@@ -643,7 +483,7 @@ function handleDelegatedChange(event) {
     course[field] = event.target.type === "checkbox" ? event.target.checked : field === "priority" ? Number(event.target.value) : event.target.value || null;
     changed = true;
   }
-  if (event.target.matches("#prefer-no-early, #prefer-no-evening, #prefer-compact, #selection-phase, #retake-confirm, #confirm-semester, #include-optional")) changed = true;
+  if (event.target.matches("#prefer-no-early, #prefer-no-evening, #prefer-compact, #selection-phase, #retake-confirm")) changed = true;
   if (changed) scheduleDraftSave();
 }
 
@@ -685,7 +525,7 @@ function renderSelectedCourses() {
     else if (activeElement.matches("[data-forbid-section]")) focusState = { type: "forbid", courseId, sectionId: activeElement.dataset.forbidSection };
   }
   const courses = [...state.selectedCourses.values()];
-  if (state.inputMode !== "curriculum") $("#course-count").textContent = `${courses.length} 门`;
+  $("#course-count").textContent = `${courses.length} 门`;
   if (!courses.length) {
     container.innerHTML = '<div class="empty-state"><span>＋</span><p>还没有添加课程</p><small>排课时每门课最多选择一个教学班组合。</small></div>';
     return;
@@ -695,13 +535,15 @@ function renderSelectedCourses() {
     const dataQualityCount = Number(course.data_quality_confirmation_section_count || 0);
     const confirmationCount = legacyCount + dataQualityCount;
     return `<div class="selected-course" data-course-id="${escapeAttribute(course.id)}">
-    <div class="selected-course-header"><span class="course-code">${escapeHtml(course.code)}</span><div class="course-copy"><strong>${escapeHtml(course.name)}</strong><small>${course.section_count ?? "培养方案"} 个教学班</small></div><button class="icon-button" data-remove-course="${escapeAttribute(course.id)}" aria-label="移除 ${escapeAttribute(course.name)}">×</button></div>
+    <div class="selected-course-header"><span class="course-code">${escapeHtml(course.code)}</span><div class="course-copy"><strong>${escapeHtml(course.name)}</strong><small>${course.section_count ?? 0} 个教学班</small></div><button class="icon-button" data-remove-course="${escapeAttribute(course.id)}" aria-label="移除 ${escapeAttribute(course.name)}">×</button></div>
     <div class="selected-course-controls">
       <label>重要程度<select data-course-field="priority"><option value="50" ${course.priority === 50 ? "selected" : ""}>可选</option><option value="100" ${course.priority === 100 ? "selected" : ""}>普通</option><option value="200" ${course.priority === 200 ? "selected" : ""}>重要</option></select></label>
       <label class="toggle-row"><input type="checkbox" data-course-field="required" ${course.required ? "checked" : ""}/><span><strong>必须排入</strong></span></label>
     </div>
     ${confirmationCount ? `<label class="quality-warning"><input type="checkbox" data-course-field="allow_confirmation_required" ${course.allow_confirmation_required ? "checked" : ""}/>允许使用需额外确认的教学班（旧版独有 ${legacyCount} 个；数据质量需确认 ${dataQualityCount} 个）；生成后仍须到教务系统核验</label>` : ""}
     ${course.unknown_time_section_count ? `<label class="quality-warning"><input type="checkbox" data-course-field="allow_unknown_time" ${course.allow_unknown_time ? "checked" : ""}/>允许采用仅有周次、具体时段待定的教学班；方案会持续显示风险</label>` : ""}
+    <button class="text-button" type="button" data-edit-course="${escapeAttribute(course.id)}">修改课程名称、教师和时间</button>
+    ${course.component_review_required || course.custom?.component_relationship_confirmed === false ? '<p class="quality-warning">请先修改课程，核对并组合必须一起上的理论、实验教学班。</p>' : ''}
     ${renderSectionPicker(course)}
   </div>`;
   }).join("");
@@ -746,10 +588,21 @@ function formatCourseRiskCounts(course) {
 }
 
 async function ensureCourseDetail(courseId, force = false) {
+  const customCourse = state.selectedCourses.get(courseId);
+  if (customCourse?.custom) {
+    const detail = customCourseDetail(customCourse);
+    Object.assign(customCourse, {name: detail.name, code: detail.code, section_count: detail.sections.length});
+    state.courseDetails.set(courseId, detail);
+    return detail;
+  }
   if (!force && state.courseDetails.has(courseId)) return state.courseDetails.get(courseId);
   if (state.courseDetailRequests.has(courseId)) return state.courseDetailRequests.get(courseId);
+  const detailsMap = state.courseDetails;
+  const requestsMap = state.courseDetailRequests;
+  const token = state.token;
   const request = api(`/api/catalog/courses/${encodeURIComponent(courseId)}`)
     .then((detail) => {
+      if (token !== state.token || detailsMap !== state.courseDetails) return null;
       state.courseDetails.set(courseId, detail);
       const course = state.selectedCourses.get(courseId);
       if (course) {
@@ -771,6 +624,7 @@ async function ensureCourseDetail(courseId, force = false) {
       return detail;
     })
     .catch((error) => {
+      if (token !== state.token || detailsMap !== state.courseDetails) return null;
       const course = state.selectedCourses.get(courseId);
       if (course) {
         course.detail_error = error.message;
@@ -778,7 +632,7 @@ async function ensureCourseDetail(courseId, force = false) {
       }
       return null;
     })
-    .finally(() => state.courseDetailRequests.delete(courseId));
+    .finally(() => requestsMap.delete(courseId));
   state.courseDetailRequests.set(courseId, request);
   return request;
 }
@@ -807,6 +661,7 @@ function renderSectionOption(course, section) {
   const unknownTime = (section.meetings || []).some((meeting) => ["week_only", "date_range", "tbd"].includes(meeting.precision));
   const dataQuality = Boolean(section.needs_confirmation && !legacyOnly && !unknownTime);
   const riskBadges = [
+    (section.meetings || []).some(m=>m.precision==="non_blocking") ? '<span class="section-risk neutral">实践安排不占时段</span>' : "",
     legacyOnly ? '<span class="section-risk legacy">旧版独有 · 需确认</span>' : "",
     dataQuality ? '<span class="section-risk quality">数据质量需确认</span>' : "",
     unknownTime ? '<span class="section-risk time">时段不精确</span>' : "",
@@ -835,6 +690,7 @@ function renderSectionOption(course, section) {
 }
 
 function formatSectionMeeting(meeting) {
+  if (meeting.precision === "non_blocking") return `${formatWeeks(meeting.weeks || [])} · 按规则不占用时段，不参与冲突`;
   const location = formatLocation(meeting.campus, meeting.room);
   const weeks = formatWeeks(meeting.weeks);
   if (meeting.precision === "async") return `异步或线上教学 · ${weeks}${location === "地点待定" ? "" : ` · ${location}`}`;
@@ -860,16 +716,7 @@ function isCrossAdministrativeClass(composition) {
 }
 
 function parseWeeks(value) {
-  const weeks = new Set();
-  value.replace(/，/g, ",").split(",").map((item) => item.trim()).filter(Boolean).forEach((part) => {
-    const match = part.match(/^(\d+)(?:-(\d+))?$/);
-    if (!match) throw new Error(`无法识别教学周“${part}”`);
-    const start = Number(match[1]), end = Number(match[2] || match[1]);
-    if (start < 1 || end > 21 || end < start) throw new Error("教学周必须在 1–21 周内");
-    for (let week = start; week <= end; week += 1) weeks.add(week);
-  });
-  if (!weeks.size) throw new Error("至少填写一个教学周");
-  return [...weeks].sort((a, b) => a - b);
+  return parseTeachingWeeks(value);
 }
 
 function addBlockedTime(event) {
@@ -884,7 +731,8 @@ function addBlockedTime(event) {
     });
     renderRules();
     scheduleDraftSave();
-  } catch (error) { toast(error.message, true); }
+  } catch (error) {
+    if (error.staleSession) return; toast(error.message, true); }
 }
 
 function addTeacherRule(event) {
@@ -907,7 +755,7 @@ function renderRules() {
 }
 
 function buildPlanningPayload({ forDraft = false } = {}) {
-  const includeManualCourses = forDraft || state.inputMode !== "curriculum";
+  const includeManualCourses = true;
   const courses = includeManualCourses ? [...state.selectedCourses.values()] : [];
   const forbiddenSectionIds = [...new Set(courses.flatMap((course) =>
     (course.forbidden_section_ids || []).filter((sectionId) => sectionId !== course.locked_section_id)
@@ -916,18 +764,13 @@ function buildPlanningPayload({ forDraft = false } = {}) {
     input_mode: state.inputMode,
     manual_courses: courses.map((course) => ({
       course_id: course.id,
+      custom: course.custom || null,
       priority: course.priority,
       required: course.required,
       locked_section_id: course.locked_section_id || null,
       allow_confirmation_required: Boolean(course.allow_confirmation_required),
       allow_unknown_time: Boolean(course.allow_unknown_time),
     })),
-    curriculum: state.inputMode === "manual" ? null : {
-      source_id: state.curriculumPreview?.source?.id || null,
-      semester: state.profile?.semester || null,
-      include_optional: state.inputMode === "mixed" && $("#include-optional").checked,
-      confirmed_by_user: $("#confirm-semester").checked,
-    },
     preferences: {
       blocked_times: state.blockedTimes,
       instructor_rules: state.instructorRules,
@@ -943,13 +786,28 @@ function buildPlanningPayload({ forDraft = false } = {}) {
 }
 
 function scheduleDraftSave() {
+  if (state.planResponse && !state.draftRestoreInProgress) {
+    state.currentResultMeta = {...state.currentResultMeta, input_is_stale:true};
+    showResultStaleness(state.currentResultMeta);
+  }
   if (!state.token || state.draftRestoreInProgress || state.draftWriteBlocked) return;
   clearTimeout(state.draftSaveTimer);
   $("#draft-save-status").textContent = "有未保存的修改…";
   state.draftSaveTimer = setTimeout(() => { void savePlanningDraft(); }, 750);
 }
 
-async function savePlanningDraft({ silent = false, force = false } = {}) {
+let draftSaveTail = Promise.resolve();
+function savePlanningDraft(options = {}) {
+  const token = state.token;
+  const job = draftSaveTail.catch(() => null).then(() => {
+    if (state.token !== token) return null;
+    return persistPlanningDraft(options);
+  });
+  draftSaveTail = job;
+  return job;
+}
+
+async function persistPlanningDraft({ silent = false, force = false } = {}) {
   if (!state.token || state.draftRestoreInProgress || (state.draftWriteBlocked && !force)) return null;
   clearTimeout(state.draftSaveTimer);
   state.draftSaveTimer = null;
@@ -963,6 +821,7 @@ async function savePlanningDraft({ silent = false, force = false } = {}) {
     $("#draft-save-status").textContent = `草稿已自动保存 · ${Number.isNaN(savedAt.getTime()) ? "刚刚" : savedAt.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
     return response;
   } catch (error) {
+    if (error.staleSession) return;
     $("#draft-save-status").textContent = `草稿保存失败：${error.message}`;
     if (!silent) toast(`草稿保存失败：${error.message}`, true);
     return null;
@@ -975,6 +834,7 @@ async function restorePlanningDraft() {
   try {
     response = await api("/api/plans/draft");
   } catch (error) {
+    if (error.staleSession) return;
     if (error.status === 404) {
       $("#draft-save-status").textContent = "尚无草稿；修改后将自动保存";
       return;
@@ -991,23 +851,20 @@ async function restorePlanningDraft() {
   const preferences = draft.preferences || {};
   state.draftRestoreInProgress = true;
   try {
-    state.inputMode = draft.input_mode || "manual";
-    $$('input[name="input-mode"]').forEach((input) => { input.checked = input.value === state.inputMode; });
-    $$(".mode-card").forEach((card) => card.classList.toggle("active", Boolean(card.querySelector(`input[value="${state.inputMode}"]`))));
+    state.inputMode = "manual";
     state.blockedTimes = Array.isArray(preferences.blocked_times) ? preferences.blocked_times : [];
     state.instructorRules = Array.isArray(preferences.instructor_rules) ? preferences.instructor_rules : [];
     $("#prefer-no-early").checked = Boolean(preferences.prefer_no_early_class);
     $("#prefer-no-evening").checked = Boolean(preferences.prefer_no_evening_class);
     $("#prefer-compact").checked = Boolean(preferences.prefer_compact_days);
-    $("#selection-phase").value = preferences.phase || "confirmation";
+    $("#selection-phase").value = preferences.phase || "planning";
     $("#retake-confirm").checked = Boolean(preferences.retake_eligibility_confirmed);
-    $("#confirm-semester").checked = Boolean(draft.curriculum?.confirmed_by_user);
-    $("#include-optional").checked = Boolean(draft.curriculum?.include_optional);
     updateRetakeConfirmation();
     state.selectedCourses = new Map((draft.manual_courses || []).map((choice) => [choice.course_id, normalizeCourseSummary({
       id: choice.course_id,
       code: choice.course_id,
       name: "正在恢复课程详情…",
+      custom: choice.custom || null,
       section_count: 0,
       required: Boolean(choice.required),
       priority: Number(choice.priority ?? 100),
@@ -1019,7 +876,6 @@ async function restorePlanningDraft() {
     updateInputModeUi();
     renderRules();
     renderSelectedCourses();
-    if (state.inputMode !== "manual" && state.profile) await matchCurriculum();
     await Promise.all([...state.selectedCourses.keys()].map((courseId) => ensureCourseDetail(courseId)));
     const forbidden = new Set(preferences.forbidden_section_ids || []);
     state.selectedCourses.forEach((course) => {
@@ -1046,6 +902,7 @@ async function loadPlanningHistory() {
     state.historyRuns = await api("/api/plans/history?limit=10");
     renderPlanningHistory();
   } catch (error) {
+    if (error.staleSession) return;
     $("#recent-plans").innerHTML = `<p class="form-error">历史方案读取失败：${escapeHtml(error.message)}</p>`;
   }
 }
@@ -1056,7 +913,7 @@ function renderPlanningHistory() {
     container.innerHTML = '<p class="muted">暂无历史方案；首次生成后会保存在这里。</p>';
     return;
   }
-  const modeLabels = { manual: "手动", curriculum: "培养方案", mixed: "混合" };
+  const modeLabels = { manual: "课程排课", curriculum: "旧版记录", mixed: "旧版记录" };
   container.innerHTML = state.historyRuns.map((run) => {
     const createdAt = new Date(run.created_at);
     const time = Number.isNaN(createdAt.getTime()) ? "时间未知" : createdAt.toLocaleString("zh-CN");
@@ -1068,16 +925,21 @@ function renderPlanningHistory() {
 }
 
 async function openHistoryRun(runId) {
+  const requestId = ++state.resultRequestId;
+  const requestToken = state.token;
   $("#plan-results").innerHTML = '<div class="plan-progress"><span class="spinner"></span><div><strong>正在读取历史方案…</strong></div></div>';
   try {
     const detail = await api(`/api/plans/history/${encodeURIComponent(runId)}`);
+    if (requestId !== state.resultRequestId) return;
     state.currentResultMeta = detail;
     state.planResponse = detail.result;
     await ensureResultCourseDetails(state.planResponse);
+    if (requestToken !== state.token || requestId !== state.resultRequestId) return;
     showResultStaleness(detail);
     renderPlanResults();
     $("#result-step").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (error) {
+    if (error.staleSession) return;
     $("#plan-results").innerHTML = `<div class="diagnostic">历史方案读取失败：${escapeHtml(error.message)}</div>`;
   }
 }
@@ -1092,6 +954,8 @@ function showResultStaleness(meta) {
   const alert = $("#result-stale-alert");
   if (meta?.schema_version != null && meta.schema_version !== 1) {
     showStaleAlert(`此历史方案使用格式版本 ${meta.schema_version}，当前界面只完整支持版本 1；请重新生成后再使用。`);
+  } else if (meta?.input_is_stale) {
+    showStaleAlert("课程、学生信息或偏好已修改；此结果对应修改前的输入，请重新排课。");
   } else if (meta?.catalog_is_stale) {
     showStaleAlert(meta.stale_reason || "课程总库已更新；此历史方案只能用于回看，请重新生成。");
   } else {
@@ -1100,26 +964,37 @@ function showResultStaleness(meta) {
   }
 }
 
-async function generatePlan() {
+async function generatePlan(maxSolutions = PLANNING_RESULT_LIMIT) {
+  if (typeof maxSolutions !== "number") maxSolutions = PLANNING_RESULT_LIMIT;
   if (!state.profile) return toast("请先保存学院、专业和年级", true);
   if (state.inputMode === "manual" && !state.selectedCourses.size) return toast("请至少添加一门课程", true);
-  if (state.inputMode !== "manual" && (!state.curriculumPreview || state.curriculumPreview.manual_only)) return toast("当前身份没有可解析培养方案，只能使用手动输入", true);
-  if (state.inputMode !== "manual" && !$("#confirm-semester").checked) return toast("请先确认实际所在学期", true);
+  const requestId = ++state.resultRequestId;
+  const requestToken = state.token;
+  const inputFingerprint = JSON.stringify({profile:state.profile, request:buildPlanningPayload()});
   const payload = buildPlanningPayload();
+  payload.preferences.max_solutions = maxSolutions;
+  $("#adjustment-results").innerHTML = "";
+  $("#more-plans").classList.add("hidden");
   $("#plan-progress").classList.remove("hidden");
   $("#plan-results").innerHTML = "";
   $("#generate-plan").disabled = true;
   try {
     await savePlanningDraft({ silent: true });
-    state.planResponse = await api("/api/plans/generate", { method: "POST", body: JSON.stringify(payload) });
+    const response = await api("/api/plans/generate", { method: "POST", body: JSON.stringify(payload) });
+    if (requestId !== state.resultRequestId) return;
+    state.planResponse = response;
     state.currentResultMeta = { catalog_is_stale: false };
     await ensureResultCourseDetails(state.planResponse);
+    if (requestToken !== state.token || requestId !== state.resultRequestId) return;
+    state.currentResultMeta.input_is_stale = inputFingerprint !== JSON.stringify({profile:state.profile,request:buildPlanningPayload()});
     showResultStaleness(state.currentResultMeta);
     renderPlanResults();
     void loadPlanningHistory();
   } catch (error) {
+    if (error.staleSession || requestId !== state.resultRequestId) return;
     $("#plan-results").innerHTML = `<div class="diagnostic">${escapeHtml(error.message)}</div>`;
   } finally {
+    if (requestId !== state.resultRequestId || requestToken !== state.token) return;
     $("#plan-progress").classList.add("hidden");
     $("#generate-plan").disabled = false;
   }
@@ -1135,8 +1010,11 @@ async function ensureResultCourseDetails(result) {
 
 function renderPlanResults() {
   const result = state.planResponse;
-  if (!result?.plans?.length) {
-    const diagnostics = result?.diagnostics || [];
+  renderAdjustment(result?.adjustment);
+  $("#more-plans").classList.toggle("hidden", !result?.plans?.length || result.all_plans_returned || result.plan_limit >= 100);
+  if (!result?.plans?.length || result.plans.every(p=>p.scheduled_course_count === 0)) {
+    $("#more-plans").classList.add('hidden');
+    const diagnostics = [...(result?.diagnostics || []), ...(result?.plans?.[0]?.explanations || []).flatMap(e=>(e.messages||[]).map(message=>({message})))];
     const warnings = result?.warnings || [];
     const warningRows = warnings.map((message) => `<div class="diagnostic persistent-warning">${escapeHtml(message)}</div>`).join("");
     const diagnosticRows = diagnostics.map((item) => `<div class="diagnostic">${escapeHtml(item.message)}</div>`).join("");
@@ -1180,10 +1058,14 @@ function formatPlanSetSummary(result) {
 }
 
 function renderPlanAt(index) {
+  state.currentPlanIndex = index;
   const result = state.planResponse, plan = result.plans[index];
   const tabs = result.plans.map((_, planIndex) => `<button type="button" role="tab" aria-selected="${planIndex === index}" class="plan-tab ${planIndex === index ? "active" : ""}" data-plan-index="${planIndex}">方案 ${planIndex + 1}</button>`).join("");
   const planSetSummary = formatPlanSetSummary(result);
-  const meetings = plan.meetings || [];
+  const allMeetings = plan.meetings || [];
+  const maxWeek = Math.max(21, ...allMeetings.flatMap(m=>m.weeks || []));
+  const meetings = allMeetings.filter(m=>!state.viewWeek || m.weeks?.includes(state.viewWeek));
+  const weekPicker = `<div class="result-tools"><label>查看周次<select data-view-week><option value="0">全部周次概览</option>${Array.from({length:maxWeek},(_,i)=>`<option value="${i+1}" ${state.viewWeek===i+1?'selected':''}>第 ${i+1} 周</option>`).join('')}</select></label><small class="muted">概览会同时显示不同周的课程，可切换单周查看。</small></div>`;
   const selectedCourses = plan.selected_courses || [];
   const selectedByOption = new Map(selectedCourses.map((course) => [course.option_id, course]));
   const maximumPeriod = Math.min(20, Math.max(12, ...meetings.map((item) => item.end_period || 0)));
@@ -1220,8 +1102,8 @@ function renderPlanAt(index) {
     return `<div class="explanation-row"><strong>${escapeHtml(courseNames.get(item.course_id) || item.course_id)}</strong><span>${messages.map(escapeHtml).join("；") || "暂无补充解释"}</span></div>`;
   }).join("");
   const unscheduled = (plan.unscheduled_courses || []).map((course) => `<div class="diagnostic">未排入：<strong>${escapeHtml(course.course_code)} ${escapeHtml(course.course_name)}</strong>。请查看下方逐课程解释，或放宽对应硬约束。</div>`).join("");
-  const phaseLabels = { preselection: "预选", confirmation: "确认", add_drop: "补退选", retake: "重修" };
-  $("#plan-results").innerHTML = `<p class="plan-set-status ${planSetSummary.kind}" role="status">${escapeHtml(planSetSummary.text)}</p><div class="plan-tabs" role="tablist" aria-label="候选方案">${tabs}</div><div class="plan-summary"><span class="summary-stat">已排 ${plan.scheduled_course_count ?? plan.selected_option_ids?.length ?? 0} 门</span><span class="summary-stat">未排 ${plan.unscheduled_course_ids?.length ?? 0} 门</span><span class="summary-stat">偏好与风险代价 ${plan.soft_penalty ?? 0}</span><span class="summary-stat">${phaseLabels[result.phase] || "未知"}阶段</span></div><div class="diagnostic-list">${globalWarnings}${planWarnings}${diagnostics}${unscheduled}</div>${renderSelectedCourseSummary(plan)}<div class="schedule-scroll"><table class="schedule-table"><caption class="sr-only">候选课表，按星期和节次排列</caption><thead><tr>${headers}</tr></thead><tbody>${rows.join("")}</tbody></table></div><div class="mobile-agenda" aria-label="移动端课程日程">${agenda || '<div class="empty-state compact"><p>没有精确时段课程；请核对上方已选教学班摘要中的待确认项目。</p></div>'}</div><section class="card explanation-card"><h3>逐课程解释</h3>${explanations || '<p class="muted">暂无课程解释。</p>'}</section>`;
+  const phaseLabels = { planning:"通用排课", preselection: "预选", confirmation: "确认", add_drop: "补退选", retake: "重修" };
+  $("#plan-results").innerHTML = `<p class="plan-set-status ${planSetSummary.kind}" role="status">${escapeHtml(planSetSummary.text)}</p><div class="plan-tabs" role="tablist" aria-label="候选方案">${tabs}</div>${weekPicker}<div class="plan-summary"><span class="summary-stat">已排 ${plan.scheduled_course_count ?? plan.selected_option_ids?.length ?? 0} 门</span><span class="summary-stat">未排 ${plan.unscheduled_course_ids?.length ?? 0} 门</span><span class="summary-stat">偏好与风险代价 ${plan.soft_penalty ?? 0}</span><span class="summary-stat">${phaseLabels[result.phase] || "未知"}阶段</span></div><div class="diagnostic-list">${globalWarnings}${planWarnings}${diagnostics}${unscheduled}</div>${renderSelectedCourseSummary(plan)}<div class="schedule-scroll"><table class="schedule-table"><caption class="sr-only">候选课表，按星期和节次排列</caption><thead><tr>${headers}</tr></thead><tbody>${rows.join("")}</tbody></table></div><div class="mobile-agenda" aria-label="移动端课程日程">${agenda || '<div class="empty-state compact"><p>当前没有需要放入网格的时段，已选课程仍显示在上方明细中。</p></div>'}</div><section class="card explanation-card"><h3>逐课程解释</h3>${explanations || '<p class="muted">暂无课程解释。</p>'}</section>`;
 }
 
 function renderMeetingBlock(meeting, selected) {
@@ -1256,13 +1138,13 @@ function renderSelectedCourseSummary(plan) {
     return `<article class="result-course-card${crossesClass ? " is-cross-class" : ""}">
       <div class="result-course-title"><span class="course-code">${escapeHtml(selected.course_code)}</span><strong>${escapeHtml(selected.course_name)}</strong></div>
       <dl><div><dt>教学班</dt><dd>${escapeHtml(sectionCodes.join("＋") || "待确认")}</dd></div><div><dt>教师</dt><dd>${escapeHtml((selected.instructors || []).join("、") || "待定")}</dd></div><div><dt>校区 / 地点</dt><dd>${escapeHtml(locations.join("；") || "待确认")}</dd></div><div><dt>教学班组成</dt><dd>${escapeHtml(compositions.join("、") || "未标注")}</dd></div></dl>
-      ${noExactTime ? '<p class="unknown-time-note">该教学班没有可放入网格的精确时段；必须结合原始课表核验，不会被视为已完成冲突检查。</p>' : ""}
+      ${selected.non_blocking_weeks?.length ? `<p class="non-blocking-note">实践安排仅记录，不占用时段，不参与冲突。${selected.non_blocking_weeks.map(formatWeeks).map(escapeHtml).join('；')}</p>` : noExactTime ? '<p class="unknown-time-note">没有精确时段，请核对课程信息。</p>' : ""}
       ${crossesClass ? `<p class="cross-class-warning"><strong>跨行政班警告：</strong>该班面向 ${escapeHtml(compositions.join("、"))}，未列出你的行政班 ${escapeHtml(state.profile?.administrative_class)}；须到教务系统核验资格。</p>` : ""}
     </article>`;
   }).join("");
   const classContext = state.profile?.administrative_class
     ? `当前行政班：${escapeHtml(state.profile.administrative_class)}`
-    : "未填写行政班号，无法自动判断跨班资格";
+    : "未填写班级标识，按时间与偏好排课";
   return `<section class="card selected-section-summary"><div class="panel-title-row"><div><h3>已选教学班明细</h3><p class="muted">${classContext}</p></div><span class="badge neutral">${selectedCourses.length} 门</span></div><div class="result-course-grid">${cards}</div></section>`;
 }
 
@@ -1334,3 +1216,8 @@ function escapeHtml(value) {
 }
 
 function escapeAttribute(value) { return escapeHtml(value); }
+
+function updateTermBadge() {
+  if (!state.profile) return;
+  $("#current-term-pill").textContent = `${state.profile.target_year || 2026} ${state.profile.target_season === "spring" ? "春季" : "秋季"}`;
+}

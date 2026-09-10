@@ -9,7 +9,7 @@ if (-not (Test-Path -LiteralPath $Python -PathType Leaf)) {
 & $Python -m pip install -e "$ProjectRoot[dev]"
 if ($LASTEXITCODE -ne 0) { throw 'Python 依赖安装失败' }
 
-& $Python -m app.cli import-catalog
-if ($LASTEXITCODE -ne 0) { throw '课程总库导入失败' }
+& $Python -m app.cli init-db
+if ($LASTEXITCODE -ne 0) { throw '数据库初始化失败' }
 
 Write-Host '初始化完成。运行 scripts\start.ps1 打开软件。' -ForegroundColor Green

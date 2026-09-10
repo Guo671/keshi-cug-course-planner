@@ -111,9 +111,7 @@ def _default_newest_path() -> Path:
     return next((path for path in candidates if path.is_file()), candidates[0])
 
 
-def _resolve_legacy_files(
-    supplied_dirs: list[Path], supplied_files: list[Path]
-) -> list[Path]:
+def _resolve_legacy_files(supplied_dirs: list[Path], supplied_files: list[Path]) -> list[Path]:
     if not supplied_dirs and not supplied_files:
         parent = PROJECT_ROOT.parent
         supplied_dirs = [
@@ -128,9 +126,7 @@ def _resolve_legacy_files(
         if not directory.is_dir():
             continue
         files.extend(
-            path
-            for path in directory.glob("*.xls")
-            if _COURSE_EXPORT_RE.fullmatch(path.name)
+            path for path in directory.glob("*.xls") if _COURSE_EXPORT_RE.fullmatch(path.name)
         )
     files.extend(path.resolve() for path in supplied_files if path.is_file())
     return sorted(set(files), key=lambda path: str(path).casefold())

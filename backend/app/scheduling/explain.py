@@ -113,9 +113,14 @@ def diagnose_infeasibility(
     required_with_candidates = [
         request for request in required_requests if accepted_by_course.get(request.course_id)
     ]
+    comparison_budget = 20000
     for left_request, right_request in combinations(required_with_candidates, 2):
         left_options = accepted_by_course[left_request.course_id]
         right_options = accepted_by_course[right_request.course_id]
+        cost = len(left_options) * len(right_options)
+        if cost > comparison_budget:
+            break  # CP-SAT proves larger cores without a quadratic Python pre-check.
+        comparison_budget -= cost
         if all(
             options_overlap(left, right) for left, right in product(left_options, right_options)
         ):

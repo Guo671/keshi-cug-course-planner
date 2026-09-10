@@ -13,6 +13,7 @@ from . import __version__
 from .api.router import api_router
 from .config import settings
 from .infrastructure.database import initialize_database
+from .infrastructure.request_limits import RequestLimitsMiddleware
 
 
 @asynccontextmanager
@@ -23,7 +24,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 def create_app(*, serve_frontend: bool = True) -> FastAPI:
     app = FastAPI(
-        title="中国地质大学（武汉）2026 秋季智能排课助手",
+        title="课石 · 通用排课助手",
         description=(
             "本地排课辅助工具；不会登录教务系统，也不会替学生提交选课。"
             "容量未知时不推断余量，旧快照独有课程默认需要再次确认。"
@@ -35,6 +36,7 @@ def create_app(*, serve_frontend: bool = True) -> FastAPI:
         lifespan=lifespan,
     )
     app.add_middleware(GZipMiddleware, minimum_size=1000)
+    app.add_middleware(RequestLimitsMiddleware)
     app.include_router(api_router)
     if serve_frontend and settings.static_dir.is_dir():
         app.mount("/", StaticFiles(directory=settings.static_dir, html=True), name="frontend")

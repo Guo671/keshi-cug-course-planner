@@ -11,8 +11,10 @@ from .schemas import StudentProfileInput, StudentProfileResponse
 router = APIRouter(prefix="/profile", tags=["profile"])
 
 
-def _semester_for(cohort_year: int, override: int | None) -> tuple[int, int, bool]:
-    inferred = 2 * (2026 - cohort_year) + 1
+def _semester_for(
+    cohort_year: int, override: int | None, year: int = 2026, season: str = "fall"
+) -> tuple[int, int, bool]:
+    inferred = 2 * (year - cohort_year) + (1 if season == "fall" else 0)
     # Transfers, leave of absence and major changes can shift the actual plan
     # semester, so the UI must display the inference for confirmation.
     actual = override or inferred
@@ -20,15 +22,20 @@ def _semester_for(cohort_year: int, override: int | None) -> tuple[int, int, boo
 
 
 def _to_response(profile: StudentProfile) -> StudentProfileResponse:
-    inferred, semester, needs_confirmation = _semester_for(
-        profile.cohort_year, profile.semester_override
-    )
     preferences = profile.preferences if isinstance(profile.preferences, dict) else {}
+    year = preferences.get("target_year", 2026)
+    season = preferences.get("target_season", "fall")
+    inferred, semester, needs_confirmation = _semester_for(
+        profile.cohort_year, profile.semester_override, year, season
+    )
     return StudentProfileResponse(
+        school=preferences.get("school", "未填写学校"),
         college=profile.college,
         major=profile.major,
         major_code=profile.major_code,
         cohort_year=profile.cohort_year,
+        target_year=year,
+        target_season=season,
         plan_variant=profile.plan_variant,
         cooperation_program=profile.cooperation_program,
         administrative_class=preferences.get("administrative_class"),
@@ -52,11 +59,13 @@ def put_profile(
     db: Database,
     user: CurrentUser,
 ) -> StudentProfileResponse:
-    inferred, semester, _ = _semester_for(payload.cohort_year, payload.semester_override)
+    inferred, semester, _ = _semester_for(
+        payload.cohort_year, payload.semester_override, payload.target_year, payload.target_season
+    )
     if semester < 1 or semester > 16:
         raise HTTPException(
             status_code=422,
-            detail="该年级已超出普通学制，请明确选择当前实际培养方案学期",
+            detail="该年级已超出普通学制，请明确选择当前实际所在学期",
         )
     profile = user.profile
     if profile is None:
@@ -68,12 +77,13 @@ def put_profile(
     profile.cohort_year = payload.cohort_year
     profile.plan_variant = payload.plan_variant
     profile.cooperation_program = payload.cooperation_program
-    existing_preferences = (
-        profile.preferences if isinstance(profile.preferences, dict) else {}
-    )
+    existing_preferences = profile.preferences if isinstance(profile.preferences, dict) else {}
     profile.preferences = {
         **existing_preferences,
         "administrative_class": payload.administrative_class,
+        "target_year": payload.target_year,
+        "target_season": payload.target_season,
+        "school": payload.school,
     }
     profile.semester_override = payload.semester_override
     db.flush()

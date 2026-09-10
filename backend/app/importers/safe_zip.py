@@ -107,7 +107,7 @@ def read_safe_zip_entries(
     *,
     snapshot_id: str,
     limits: ZipSafetyLimits = DEFAULT_ZIP_SAFETY_LIMITS,
-    suffixes: tuple[str, ...] = (".xls",),
+    suffixes: tuple[str, ...] = (".xls", ".xlsx"),
 ) -> tuple[tuple[SafeZipEntry, ...], tuple[ImportIssue, ...]]:
     """Read approved members into memory, never writing member names to disk."""
 
@@ -159,6 +159,13 @@ def read_safe_zip_entries(
                 if suffixes and not decoded_name.casefold().endswith(
                     tuple(s.casefold() for s in suffixes)
                 ):
+                    issues.append(
+                        ImportIssue(
+                            code="unsupported_archive_member",
+                            message=f"未读取非 Excel 文件：{decoded_name}",
+                            severity=IssueSeverity.WARNING,
+                        )
+                    )
                     continue
                 if info.file_size > limits.max_entry_bytes:
                     issues.append(

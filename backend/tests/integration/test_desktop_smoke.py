@@ -46,19 +46,19 @@ def test_versions_stay_in_lockstep() -> None:
     with (PROJECT_ROOT / "pyproject.toml").open("rb") as project_file:
         project_version = tomllib.load(project_file)["project"]["version"]
 
-    assert project_version == __version__ == APP_VERSION == "0.2.0"
+    assert project_version == __version__ == APP_VERSION == "0.3.1"
     assert create_app(serve_frontend=False).version == __version__
     version_resource = (PROJECT_ROOT / "desktop" / "windows_version_info.txt").read_text(
         encoding="utf-8"
     )
-    assert "StringStruct(u'ProductVersion', u'0.2.0')" in version_resource
+    assert "StringStruct(u'ProductVersion', u'0.3.1')" in version_resource
 
 
 def test_desktop_version_command_is_scriptable() -> None:
     completed = _run_desktop("--version")
 
     assert completed.returncode == 0, completed.stderr
-    assert completed.stdout.strip() == "Keshi 0.2.0"
+    assert completed.stdout.strip() == "Keshi 0.3.1"
 
 
 def test_desktop_smoke_copies_once_preserves_state_and_releases_port(tmp_path: Path) -> None:

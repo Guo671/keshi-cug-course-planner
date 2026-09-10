@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import re
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from zipfile import ZipFile
 
 from .models import (
     CatalogSnapshot,
@@ -45,9 +47,9 @@ _PERIOD_PREFIX_RE = re.compile(r"^\s*[（(](?P<start>\d+)-(?P<end>\d+)节[）)]\
 _WEEK_SEGMENT_RE = re.compile(
     r"^(?P<start>\d+)(?:-(?P<end>\d+))?周(?:[（(](?P<parity>单|双)[）)])?$"
 )
-_NORMAL_SECTION_RE = re.compile(r"-(?P<base>\d{4})(?P<suffix>[A-Za-z]?)(?![A-Za-z0-9])")
+_NORMAL_SECTION_RE = re.compile(r"-(?P<base>\d{4,5})(?P<suffix>[A-Za-z]?)(?![A-Za-z0-9])")
 _LOOSE_SECTION_RE = re.compile(
-    r"(?<![A-Za-z0-9])(?P<base>\d{4})(?P<suffix>[A-Za-z]?)(?![A-Za-z0-9])"
+    r"(?<![A-Za-z0-9])(?P<base>\d{4,5})(?P<suffix>[A-Za-z]?)(?![A-Za-z0-9])"
 )
 _PRACTICE_HEAD_RE = re.compile(r"^(?P<prefix>.*)[（(]共(?P<count>\d+)周[）)]$")
 _INSTRUCTOR_SPLIT_RE = re.compile(r"[，,、;；]+")
@@ -98,7 +100,7 @@ def parse_week_expression(
     if prefix:
         start_period = int(prefix.group("start"))
         end_period = int(prefix.group("end"))
-        if start_period < 1 or end_period < start_period:
+        if start_period < 1 or end_period < start_period or end_period > 20:
             issues.append(
                 _issue(
                     "period_expression_invalid",
@@ -251,6 +253,29 @@ def parse_workbook_bytes(
 
     if len(data) > max_bytes:
         raise WorkbookImportError(f"workbook exceeds {max_bytes} bytes")
+    if data.startswith(b"PK"):
+        try:
+            from openpyxl import load_workbook  # type: ignore[import-untyped]
+
+            with ZipFile(io.BytesIO(data)) as archive:
+                infos = archive.infolist()
+                if len(infos) > 2500 or sum(i.file_size for i in infos) > 64 * 1024 * 1024:
+                    raise WorkbookImportError("XLSX 解压后过大")
+            book_x = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+            try:
+                if len(book_x.worksheets) != 1:
+                    raise WorkbookImportError("每个课程工作簿须只有一个工作表，避免漏导其他表")
+                sheet_x = book_x.worksheets[0]
+                if sheet_x.max_row > 10000 or sheet_x.max_column > 100:
+                    raise WorkbookImportError("课程工作表超出 10000 行 / 100 列限制")
+                matrix_x = tuple(tuple(row) for row in sheet_x.iter_rows(values_only=True))
+                return parse_schedule_matrix(matrix_x, source=source, sheet_name=sheet_x.title)
+            finally:
+                book_x.close()
+        except WorkbookImportError:
+            raise
+        except Exception as exc:
+            raise WorkbookImportError(f"无法读取 XLSX：{exc}") from exc
     if not data.startswith(OLE2_SIGNATURE):
         raise WorkbookImportError("not an OLE2/BIFF .xls workbook")
     try:
@@ -262,8 +287,8 @@ def parse_workbook_bytes(
     except Exception as exc:
         raise WorkbookImportError(f"xlrd could not open workbook: {exc}") from exc
     try:
-        if book.nsheets < 1:
-            raise WorkbookImportError("workbook contains no worksheets")
+        if book.nsheets != 1:
+            raise WorkbookImportError("每个课程工作簿须只有一个工作表")
         sheet = book.sheet_by_index(0)
         matrix = tuple(
             tuple(_cell_text(sheet.cell_value(row, column)) for column in range(sheet.ncols))
@@ -283,8 +308,12 @@ def parse_schedule_matrix(
     """Parse already-read cell values; useful for deterministic unit tests."""
 
     matrix = tuple(tuple(_cell_text(value) for value in row) for row in rows)
+    from .standard_excel import is_standard_table, parse_standard_table
+
+    if is_standard_table(matrix):
+        return parse_standard_table(matrix, source, sheet_name)
     if len(matrix) < 8 or max((len(row) for row in matrix), default=0) < 9:
-        raise WorkbookImportError("schedule sheet is smaller than the expected 8x9 grid")
+        raise WorkbookImportError("未识别为课程课表，请使用学校导出的课表或课石标准模板")
 
     filename = source.original_entry_name or Path(source.container).name
     filename_meta = _parse_filename(filename)
@@ -590,6 +619,12 @@ def _parse_section_code(
         base = match.group("base")
         suffix = match.group("suffix") or None
         return base + (suffix or ""), base, suffix, Confidence.HIGH, ()
+    labelled = re.search(
+        r"-(?P<label>(?:[\u4e00-\u9fff]{1,16}\d{4,5}[A-Za-z]?|[A-Za-z]\d{1,3}-\d{1,3}))(?=$|[（(])",
+        class_label,
+    )
+    if labelled:
+        return labelled.group("label"), None, None, Confidence.HIGH, ()
     loose_matches = tuple(_LOOSE_SECTION_RE.finditer(class_label))
     loose = loose_matches[-1] if loose_matches else None
     if loose:
@@ -664,6 +699,19 @@ def _parse_practice_record(
         parts += [""] * (4 - len(parts))
     head = "/".join(parts[:-3]).strip()
     week_raw, class_label, composition_raw = parts[-3:]
+    # Both the course name and teaching-class label can contain '/', e.g. C/C++.
+    week_positions = [
+        index
+        for index in range(1, len(parts) - 2)
+        if "周" in parts[index]
+        and not parse_week_expression(parts[index], total_weeks=total_weeks).issues
+    ]
+    if len(week_positions) == 1:
+        boundary = week_positions[0]
+        head = "/".join(parts[:boundary]).strip()
+        week_raw = parts[boundary]
+        class_label = "/".join(parts[boundary + 1 : -1]).strip()
+        composition_raw = parts[-1]
     declared_weeks: int | None = None
     instructor_raw = ""
     head_match = _PRACTICE_HEAD_RE.fullmatch(head)

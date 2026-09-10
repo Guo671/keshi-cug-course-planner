@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import combinations
 
 from .models import Meeting, SectionOption
 
@@ -39,3 +40,19 @@ def options_overlap(left: SectionOption, right: SectionOption) -> bool:
         for left_meeting in left.meetings
         for right_meeting in right.meetings
     )
+
+
+def has_internal_conflict(option: SectionOption) -> bool:
+    """Repeated descriptions of the same slot are harmless; different overlaps are not."""
+    for left, right in combinations(option.meetings, 2):
+        if not left.overlaps(right):
+            continue
+        if (left.weekday, left.start_period, left.end_period, left.campus, left.room) != (
+            right.weekday,
+            right.start_period,
+            right.end_period,
+            right.campus,
+            right.room,
+        ):
+            return True
+    return False

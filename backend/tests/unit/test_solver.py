@@ -454,8 +454,10 @@ def test_diversity_distance_cannot_claim_full_enumeration() -> None:
 
 
 def test_solver_limit_cannot_exceed_product_contract() -> None:
-    with pytest.raises(ValueError, match="cannot exceed 10"):
-        SolverConfig(max_solutions=11)
+    assert SolverConfig().max_solutions == 10
+    assert SolverConfig(max_solutions=20).max_solutions == 20
+    with pytest.raises(ValueError, match="cannot exceed 100"):
+        SolverConfig(max_solutions=101)
 
 
 @pytest.mark.parametrize(

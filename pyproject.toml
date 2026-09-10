@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cug-course-planner"
-version = "0.2.0"
-description = "中国地质大学（武汉）2026 秋季本地选课排课助手"
+version = "0.3.1"
+description = "由果果开发的通用本地排课助手"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -20,6 +20,7 @@ dependencies = [
   "sqlalchemy>=2.0,<3",
   "uvicorn[standard]>=0.34,<1",
   "xlrd>=2.0.2,<3",
+  "openpyxl>=3.1.5,<4",
 ]
 
 [project.scripts]

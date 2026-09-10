@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_dynamic_libs, collect_submodules
 
 project_root = Path(SPECPATH).resolve().parent
 backend_root = project_root / "backend"
@@ -14,26 +14,28 @@ if not seed_database.is_file():
 
 datas = [
     (str(project_root / "frontend"), "frontend"),
-    (str(project_root / "data" / "catalog"), "data/catalog"),
-    (str(project_root / "data" / "curricula"), "data/curricula"),
+    (str(project_root / "data" / "catalog" / "catalog-2026-09-10.json"), "data/catalog"),
     (str(seed_database), "seed"),
     (str(project_root / "desktop" / "assets"), "desktop/assets"),
 ]
 
 hiddenimports = collect_submodules("uvicorn") + [
     "webview.platforms.edgechromium",
+    "ortools.sat.python.cp_model",
 ]
 
 a = Analysis(
     [str(project_root / "desktop" / "launcher.py")],
     pathex=[str(project_root), str(backend_root)],
-    binaries=[],
+    binaries=collect_dynamic_libs("ortools"),
     datas=datas,
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
+        "PIL.PdfImagePlugin",
+        "PIL.PdfParser",
         "cefpython3",
         "gi",
         "PyQt5",
@@ -78,5 +80,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="课石-v0.2.0-win64",
+    name="课石-v0.3.1-win64",
 )

@@ -50,10 +50,13 @@ class UserResponse(BaseModel):
 
 
 class StudentProfileInput(BaseModel):
+    school: NonEmptyText = "未填写学校"
     college: NonEmptyText
     major: NonEmptyText
     major_code: str | None = Field(default=None, max_length=32)
-    cohort_year: int = Field(ge=2015, le=2026)
+    cohort_year: int = Field(ge=2015, le=2100)
+    target_year: int = Field(default=2026, ge=2020, le=2100)
+    target_season: Literal["fall", "spring"] = "fall"
     plan_variant: str | None = Field(default=None, max_length=128)
     cooperation_program: NonEmptyText = "无"
     administrative_class: str | None = Field(default=None, max_length=32)
@@ -74,6 +77,9 @@ class StudentProfileResponse(StudentProfileInput):
 
 
 class CatalogStatusResponse(BaseModel):
+    mixed_time_section_count: int = 0
+    source_label: str | None = None
+    non_blocking_section_count: int = 0
     ready: bool
     course_count: int
     section_count: int
@@ -112,6 +118,8 @@ class SectionResponse(BaseModel):
 
 
 class CourseSearchResult(BaseModel):
+    non_blocking_section_count: int = 0
+    component_review_required: bool = False
     id: str
     code: str
     name: str
@@ -130,12 +138,63 @@ class CourseDetail(CourseSearchResult):
 
 class InputMode(StrEnum):
     MANUAL = "manual"
-    CURRICULUM = "curriculum"
-    MIXED = "mixed"
+
+
+class CustomMeeting(BaseModel):
+    non_blocking: bool = False
+    weeks: list[Annotated[int, Field(strict=True)]] = Field(default_factory=list, max_length=64)
+    weekday: int | None = Field(default=None, ge=1, le=7, strict=True)
+    start_period: int | None = Field(default=None, ge=1, le=20, strict=True)
+    end_period: int | None = Field(default=None, ge=1, le=20, strict=True)
+    room: str | None = Field(default=None, max_length=128)
+    campus: str | None = Field(default=None, max_length=128)
+
+    @model_validator(mode="after")
+    def validate_time(self) -> CustomMeeting:
+        if self.non_blocking:
+            self.weekday = self.start_period = self.end_period = None
+        elif (
+            not self.weeks
+            or self.weekday is None
+            or self.start_period is None
+            or self.end_period is None
+        ):
+            raise ValueError("普通课程必须填写周次、星期、开始及结束节次")
+        if (
+            self.end_period is not None
+            and self.start_period is not None
+            and self.end_period < self.start_period
+        ):
+            raise ValueError("结束节次不能早于开始节次")
+        if any(w < 1 or w > 64 for w in self.weeks):
+            raise ValueError("教学周必须在 1–64 周内")
+        self.weeks = sorted(set(self.weeks))
+        return self
+
+
+class CustomSection(BaseModel):
+    id: NonEmptyText
+    section_code: NonEmptyText = Field(default="自填教学班", max_length=128)
+    instructors: list[NonEmptyText] = Field(default_factory=list, max_length=20)
+    meetings: list[CustomMeeting] = Field(min_length=1, max_length=100)
+
+
+class CustomCourse(BaseModel):
+    component_relationship_confirmed: bool = True
+    name: NonEmptyText
+    code: str = Field(default="自填", max_length=64)
+    sections: list[CustomSection] = Field(min_length=1, max_length=100)
+
+    @model_validator(mode="after")
+    def unique_sections(self) -> CustomCourse:
+        if len({s.id for s in self.sections}) != len(self.sections):
+            raise ValueError("教学班标识不能重复")
+        return self
 
 
 class CourseChoice(BaseModel):
     course_id: str = Field(min_length=1, max_length=160)
+    custom: CustomCourse | None = None
     priority: int = Field(default=100, ge=0, le=10_000)
     required: bool = False
     locked_section_id: str | None = Field(default=None, max_length=256)
@@ -157,8 +216,8 @@ class BlockedTimeInput(BaseModel):
     def validate_range(self) -> BlockedTimeInput:
         if self.end_period < self.start_period:
             raise ValueError("结束节次不能早于开始节次")
-        if any(week < 1 or week > 21 for week in self.weeks):
-            raise ValueError("教学周必须在 1–21 周内")
+        if any(week < 1 or week > 64 for week in self.weeks):
+            raise ValueError("教学周必须在 1–64 周内")
         if len(set(self.weeks)) != len(self.weeks):
             raise ValueError("教学周不能重复")
         return self
@@ -179,30 +238,20 @@ class PlanningPreferences(BaseModel):
     prefer_no_early_class: bool = False
     prefer_no_evening_class: bool = False
     prefer_compact_days: bool = False
-    max_solutions: int = Field(default=10, ge=1, le=10)
-    phase: Literal["preselection", "confirmation", "add_drop", "retake"] = "confirmation"
+    max_solutions: int = Field(default=10, ge=1, le=100)
+    phase: Literal["planning", "preselection", "confirmation", "add_drop", "retake"] = "planning"
     retake_eligibility_confirmed: bool = False
 
 
-class CurriculumSelection(BaseModel):
-    source_id: str | None = None
-    semester: int | None = Field(default=None, ge=1, le=16)
-    include_optional: bool = False
-    confirmed_by_user: bool = False
-
-
 class PlanRequest(BaseModel):
-    input_mode: InputMode
+    input_mode: InputMode = InputMode.MANUAL
     manual_courses: list[CourseChoice] = Field(default_factory=list, max_length=200)
-    curriculum: CurriculumSelection | None = None
     preferences: PlanningPreferences = Field(default_factory=PlanningPreferences)
 
     @model_validator(mode="after")
     def validate_mode_payload(self) -> PlanRequest:
-        if self.input_mode is InputMode.MANUAL and not self.manual_courses:
-            raise ValueError("手动模式至少需要添加一门课程")
-        if self.input_mode in {InputMode.CURRICULUM, InputMode.MIXED} and self.curriculum is None:
-            raise ValueError("培养方案或混合模式需要指定培养方案")
+        if not self.manual_courses:
+            raise ValueError("至少需要添加一门课程")
         return self
 
 
@@ -213,8 +262,16 @@ class PlanningDraft(BaseModel):
 
     input_mode: InputMode = InputMode.MANUAL
     manual_courses: list[CourseChoice] = Field(default_factory=list, max_length=200)
-    curriculum: CurriculumSelection | None = None
     preferences: PlanningPreferences = Field(default_factory=PlanningPreferences)
+
+    @model_validator(mode="before")
+    @classmethod
+    def migrate_legacy_mode(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            value = dict(value)
+            value.pop("curriculum", None)  # Discard the retired field in v0.2 drafts.
+            value["input_mode"] = "manual"
+        return value
 
 
 class PlanningDraftResponse(BaseModel):
@@ -227,61 +284,19 @@ class PlanningDraftResponse(BaseModel):
     stale_reason: str | None = None
 
 
-class CurriculumCourseResponse(BaseModel):
-    code: str
-    name: str
-    semester: int
-    credits: float | None = None
-    required: bool = True
-    matched_course_id: str | None = None
-    match_state: str = "unmatched"
-    category: str | None = None
-    requirement_type: str | None = None
-    selection_group: str | None = None
-    selection_rule: str | None = None
-    source_page: int | None = None
-    section_count: int = 0
-    eligible_section_count: int = 0
-    confirmation_required_section_count: int = 0
-    legacy_only_section_count: int = 0
-    data_quality_confirmation_section_count: int = 0
-    unknown_time_section_count: int = 0
-
-
-class CurriculumSourceResponse(BaseModel):
-    id: str
-    college: str
-    major: str
-    cohort_year: int | None = None
-    plan_variant: str | None = None
-    status: str
-    official_url: str | None = None
-    document_url: str | None = None
-    checked_at: str | None = None
-    note: str | None = None
-    supports_import: bool = False
-
-
-class CurriculumPreviewResponse(BaseModel):
-    source: CurriculumSourceResponse | None
-    semester: int
-    courses: list[CurriculumCourseResponse]
-    manual_only: bool
-    warnings: list[str] = Field(default_factory=list)
-
-
 class PlanResponse(BaseModel):
     schema_version: Literal[1] = 1
     run_id: str
     status: str
     plans: list[dict[str, Any]]
-    plan_limit: int = Field(ge=1, le=10)
+    plan_limit: int = Field(ge=1, le=100)
     all_plans_returned: bool
     plans_truncated: bool
     diagnostics: list[dict[str, Any]]
     warnings: list[str]
     catalog_fingerprint: str
     phase: str
+    adjustment: dict[str, Any] | None = None
 
     @model_validator(mode="after")
     def validate_enumeration_metadata(self) -> PlanResponse:

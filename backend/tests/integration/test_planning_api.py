@@ -11,7 +11,7 @@ def _save_profile(client: TestClient, headers: dict[str, str]) -> None:
     response = client.put(
         "/api/profile",
         headers=headers,
-        json={"college": "自动化学院", "major": "自动化", "cohort_year": 2024},
+        json={"school":"中国地质大学（武汉）", "college": "自动化学院", "major": "自动化", "cohort_year": 2024},
     )
     assert response.status_code == 200, response.text
 
@@ -347,66 +347,3 @@ def test_retake_phase_requires_eligibility_confirmation(
     assert allowed.status_code == 200, allowed.text
     assert allowed.json()["phase"] == "retake"
     assert any("冲突免听" in item for item in allowed.json()["warnings"])
-
-
-def test_manual_only_identity_cannot_be_recorded_as_mixed_mode(
-    client: TestClient,
-    auth_headers: dict[str, str],
-    session_factory: sessionmaker[Session],
-) -> None:
-    saved = client.put(
-        "/api/profile",
-        headers=auth_headers,
-        json={
-            "college": "机械与电子信息学院",
-            "major": "机械设计制造及其自动化",
-            "cohort_year": 2024,
-            "cooperation_program": "无",
-        },
-    )
-    assert saved.status_code == 200
-    _seed_course(
-        session_factory,
-        course_id="MANUAL:手工课程",
-        code="MANUAL",
-        name="手工课程",
-    )
-    payload = _plan_payload("MANUAL:手工课程")
-    payload["input_mode"] = "mixed"
-    payload["curriculum"] = {
-        "source_id": None,
-        "semester": 5,
-        "confirmed_by_user": True,
-    }
-    response = client.post("/api/plans/generate", headers=auth_headers, json=payload)
-    assert response.status_code == 422
-    assert "只能使用手动输入" in response.json()["detail"]
-
-
-def test_mixed_mode_keeps_omitted_curriculum_requirements_as_warnings(
-    client: TestClient,
-    auth_headers: dict[str, str],
-    session_factory: sessionmaker[Session],
-) -> None:
-    _save_profile(client, auth_headers)
-    _seed_course(
-        session_factory,
-        course_id="UNRELATED:无关课程",
-        code="UNRELATED",
-        name="无关课程",
-    )
-    payload = _plan_payload("UNRELATED:无关课程")
-    payload["input_mode"] = "mixed"
-    payload["curriculum"] = {
-        "source_id": "au:080801:ordinary",
-        "semester": 5,
-        "confirmed_by_user": True,
-    }
-
-    response = client.post("/api/plans/generate", headers=auth_headers, json=payload)
-
-    assert response.status_code == 200, response.text
-    warnings = " ".join(response.json()["warnings"])
-    assert "未匹配" in warnings
-    assert "方向" in warnings
-    assert "不会把它们视为已完成" in warnings

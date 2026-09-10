@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import importlib
-from dataclasses import dataclass
-from itertools import combinations
+from dataclasses import dataclass, replace
+from time import monotonic
 from typing import Any
 
 try:  # Keep domain and validation usable when the optional solver is absent.
@@ -12,7 +12,6 @@ try:  # Keep domain and validation usable when the optional solver is absent.
 except ImportError:  # pragma: no cover - exercised by monkeypatch in unit tests
     cp_model = None
 
-from ..domain.conflicts import options_overlap
 from ..domain.planning import (
     Diagnostic,
     SchedulePlan,
@@ -26,6 +25,7 @@ from .explain import (
     diagnose_infeasibility,
 )
 from .fallback import deterministic_search
+from .resources import size_limit_message
 from .scoring import plan_level_soft_penalty
 from .validation import validate_plan
 
@@ -38,12 +38,12 @@ class SolverInvariantError(RuntimeError):
     """Raised if the independent validator rejects a generated plan."""
 
 
-MAX_RETURNED_PLANS = 10
+MAX_RETURNED_PLANS = 100
 
 
 @dataclass(frozen=True, slots=True)
 class SolverConfig:
-    max_solutions: int = MAX_RETURNED_PLANS
+    max_solutions: int = 10
     time_limit_seconds: float = 5.0
     random_seed: int = 0
     min_option_difference: int = 1
@@ -75,6 +75,14 @@ class ScheduleSolver:
         self.config = config or SolverConfig()
 
     def solve(self, problem: SchedulingProblem) -> SolveResult:
+        deadline = monotonic() + self.config.time_limit_seconds
+        size_error = size_limit_message(problem)
+        if size_error:
+            return SolveResult(
+                status=SolveStatus.DATA_ERROR,
+                plan_limit=self.config.max_solutions,
+                diagnostics=(Diagnostic(code="WORK_LIMIT_EXCEEDED", message=size_error),),
+            )
         audit = evaluate_candidates(problem)
         known_diagnostics = diagnose_infeasibility(problem, audit, include_generic=False)
         if known_diagnostics:
@@ -106,17 +114,18 @@ class ScheduleSolver:
         # that the returned list exhausted the remaining search space.  The
         # extra plan is deliberately not preference-optimized or serialized.
         for _ in range(self.config.max_solutions + 1):
+            if plans and monotonic() >= deadline:
+                all_passes_optimal = False
+                break
             first_pass = _solve_pass(
                 problem=problem,
                 audit=audit,
-                config=self.config,
+                config=replace(self.config, time_limit_seconds=max(0.001, deadline - monotonic())),
                 prior_selections=prior_selections,
                 coverage_target=None,
             )
             if first_pass.status == cp_model.INFEASIBLE:
-                all_plans_returned = (
-                    not plans or self.config.min_option_difference == 1
-                )
+                all_plans_returned = not plans or self.config.min_option_difference == 1
                 if plans:
                     break
                 return SolveResult(
@@ -164,7 +173,7 @@ class ScheduleSolver:
             second_pass = _solve_pass(
                 problem=problem,
                 audit=audit,
-                config=self.config,
+                config=replace(self.config, time_limit_seconds=max(0.001, deadline - monotonic())),
                 prior_selections=prior_selections,
                 coverage_target=first_pass.coverage_score,
             )
@@ -222,14 +231,19 @@ class ScheduleSolver:
         all_plans_returned = False
         plans_truncated = False
 
+        remaining_nodes = self.config.fallback_node_limit
         for _ in range(self.config.max_solutions + 1):
+            if remaining_nodes < 1:
+                all_searches_complete = False
+                break
             search = deterministic_search(
                 problem,
                 audit,
                 prior_selections=prior_selections,
                 min_option_difference=self.config.min_option_difference,
-                node_limit=self.config.fallback_node_limit,
+                node_limit=remaining_nodes,
             )
+            remaining_nodes -= search.nodes_visited
             if search.selected_option_ids is None:
                 all_plans_returned = search.search_complete and (
                     not plans or self.config.min_option_difference == 1
@@ -297,6 +311,10 @@ class _PassResult:
     coverage_score: int = 0
 
 
+class ModelBudgetExceeded(Exception):
+    pass
+
+
 def _solve_pass(
     *,
     problem: SchedulingProblem,
@@ -305,12 +323,20 @@ def _solve_pass(
     prior_selections: list[tuple[str, ...]],
     coverage_target: int | None,
 ) -> _PassResult:
-    model, variables, coverage_expression, penalty_expression = _build_model(
-        problem=problem,
-        audit=audit,
-        prior_selections=prior_selections,
-        min_option_difference=config.min_option_difference,
-    )
+    deadline = monotonic() + config.time_limit_seconds
+    try:
+        model, variables, coverage_expression, penalty_expression = _build_model(
+            problem=problem,
+            audit=audit,
+            prior_selections=prior_selections,
+            min_option_difference=config.min_option_difference,
+            deadline=deadline,
+        )
+    except ModelBudgetExceeded:
+        return _PassResult(status=cp_model.UNKNOWN)
+    remaining = deadline - monotonic()
+    if remaining <= 0:
+        return _PassResult(status=cp_model.UNKNOWN)
     if coverage_target is None:
         model.Maximize(coverage_expression)
     else:
@@ -318,7 +344,7 @@ def _solve_pass(
         model.Minimize(penalty_expression)
 
     cp_solver = cp_model.CpSolver()
-    cp_solver.parameters.max_time_in_seconds = config.time_limit_seconds
+    cp_solver.parameters.max_time_in_seconds = remaining
     cp_solver.parameters.random_seed = config.random_seed
     cp_solver.parameters.num_search_workers = 1
     status = cp_solver.Solve(model)
@@ -351,6 +377,7 @@ def _build_model(
     audit: CandidateAudit,
     prior_selections: list[tuple[str, ...]],
     min_option_difference: int,
+    deadline: float | None = None,
 ) -> tuple[Any, dict[str, Any], Any, Any]:
     model = cp_model.CpModel()
     accepted = audit.accepted_options
@@ -371,12 +398,26 @@ def _build_model(
     for locked_id in problem.constraints.locked_option_ids:
         model.Add(variables[locked_id] == 1)
 
-    for left, right in combinations(accepted, 2):
-        if left.course_id == right.course_id:
-            # Already covered by the per-course at-most-one constraint.
-            continue
-        if options_overlap(left, right):
-            model.Add(variables[left.id] + variables[right.id] <= 1)
+    occupied: dict[tuple[int, int, int], set[str]] = {}
+    for index, option in enumerate(accepted):
+        if index % 32 == 0 and deadline is not None and monotonic() >= deadline:
+            raise ModelBudgetExceeded
+        for meeting in option.meetings:
+            if not meeting.is_exact:
+                continue
+            assert meeting.weekday is not None
+            assert meeting.start_period is not None and meeting.end_period is not None
+            for week in meeting.weeks.weeks:
+                for period in range(meeting.start_period, meeting.end_period + 1):
+                    occupied.setdefault((week, meeting.weekday, period), set()).add(option.id)
+    seen: set[frozenset[str]] = set()
+    for index, ids in enumerate(occupied.values()):
+        if index % 64 == 0 and deadline is not None and monotonic() >= deadline:
+            raise ModelBudgetExceeded
+        signature = frozenset(ids)
+        if len(signature) > 1 and signature not in seen:
+            model.AddAtMostOne(variables[oid] for oid in sorted(ids))
+            seen.add(signature)
 
     for selection in prior_selections:
         if not variables:
@@ -409,8 +450,7 @@ def _build_model(
                 variables[option.id]
                 for option in accepted
                 if any(
-                    meeting.is_exact and meeting.weekday == weekday
-                    for meeting in option.meetings
+                    meeting.is_exact and meeting.weekday == weekday for meeting in option.meetings
                 )
             ]
             if not day_option_variables:
@@ -437,9 +477,7 @@ def _make_plan(
     request_by_course = {request.course_id: request for request in problem.requests}
     coverage_score = sum(request_by_course[course_id].priority for course_id in selected_course_ids)
     evaluation_by_id = audit.by_id()
-    selected_options = [
-        option for option in audit.accepted_options if option.id in selected_set
-    ]
+    selected_options = [option for option in audit.accepted_options if option.id in selected_set]
     soft_penalty = sum(
         evaluation_by_id[option_id].soft_penalty for option_id in selected_ids
     ) + plan_level_soft_penalty(problem, selected_options)
