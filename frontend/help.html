@@ -4,6 +4,8 @@
 :root{font-family:"Microsoft YaHei UI","Microsoft YaHei",sans-serif;color:#263b35;background:#fffefa;line-height:1.85}*{box-sizing:border-box}body{max-width:1000px;margin:auto;padding:24px 30px 60px}h1,h2,h3{line-height:1.4}h1{color:#20594d;margin:0 0 12px}h2{margin:36px 0 14px;padding-top:14px;border-top:1px solid #d8e5df;color:#20594d}h3{margin-bottom:8px;font-size:17px}p{margin:10px 0}nav{display:flex;gap:10px;flex-wrap:wrap;padding:18px;background:#edf5f8;border-radius:14px}nav a{background:white;padding:6px 12px;border-radius:8px;color:#246584;text-decoration:none;border:1px solid #d4e6ed}a:focus-visible{outline:3px solid #528bc2}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{padding:10px 12px;border:1px solid #d6e0da;text-align:left;vertical-align:top}th{background:#eaf2ed;color:#20594d}.table-wrap{overflow:auto}.note{background:#f0f7f9;border-left:4px solid #68a8c1;padding:13px 18px;margin:18px 0;border-radius:8px}code{overflow-wrap:anywhere;background:#f0f1ed;padding:2px 5px;border-radius:4px}li{margin:7px 0}small{color:#596e64}@media(max-width:540px){body{padding:18px 16px 40px;font-size:14px}h1{font-size:25px}h2{font-size:21px}th,td{padding:8px}nav{padding:12px;gap:8px}}@media print{nav{display:none}body{max-width:none;padding:0}h2{break-after:avoid}}
 </style></head><body>
 <h1>课石使用说明</h1><p><strong>由果果开发 · 适用于不同学校的本地排课工具</strong></p>
+<p><strong>适用版本：0.3.2 · 说明更新：2026年9月14日</strong></p>
+<div class="note"><strong>本次修复：</strong>0.3.2 已修复桌面版“下载标准 Excel 模板”点击无反应的问题。点击后应弹出保存文件对话框，选择位置并保存。只更新 GitHub 下载包不会自动更新电脑中已经安装的旧版；升级时需要完整解压新版并启动新版程序。</div>
 <p>本说明随软件保存在电脑中，断网也能打开。课石帮助你在已经确定要修读的课程之间选择教学班、核对时间并生成候选课表。正式选课仍须在学校教务系统完成。</p>
 <nav aria-label="说明目录"><a href="#quick">快速开始</a><a href="#accounts">账号与离线使用</a><a href="#catalog">课程总库</a><a href="#import">Excel 导入</a><a href="#manual">手动编辑</a><a href="#preferences">排课偏好</a><a href="#results">查看结果</a><a href="#leave">请假与删课建议</a><a href="#storage">保存与升级</a><a href="#questions">常见问题</a></nav>
 <h2 id="quick">一、第一次使用</h2>
@@ -20,6 +22,8 @@
 <h2 id="import">四、从 Excel 导入课程</h2>
 <p>已下载自己想上的课时，使用“导入课程课表”，选择 1—20 个 XLS／XLSX，再点击“导入到待排课程”。每个文件一门课程、一个工作表，可包含该课程的多个教学班。</p>
 <p>支持已经验证的学校导出课表布局，以及软件内下载的“标准 Excel 模板”。文件扩展名相同不代表排版相同，任意制作的表格不一定能识别。</p>
+<h3>下载模板与填写示例</h3>
+<ol><li>在“本学期课程”点击“下载标准 Excel 模板”，在保存对话框中选好位置并保存，然后用 Excel 或 WPS 打开。</li><li>将模板中的示例课程号和课程名称逐行替换为自己的课程信息，删除不用的示例行。同一文件内所有行必须使用一致的课程号和课程名称。</li><li>同一教学班的多个时段填写多行；不同教学班填写不同班号。多门课程分别保存为多个文件，再一次选择1—20个文件导入。</li><li>若提示某行课程号或课程名称不一致，检查报错行与前面各行，尤其确认是否残留示例行。不要只修改第一行。</li></ol>
 <div class="table-wrap"><table><thead><tr><th>模板列</th><th>填写方式</th></tr></thead><tbody>
 <tr><td>课程名称</td><td>必填。同一工作簿使用同一课程名称。</td></tr><tr><td>课程号</td><td>选填，建议填写学校课程号并设置为文本。相同课程号属于同一门课。</td></tr><tr><td>教学班</td><td>例如 0001、0002；同班多时段填写多行。不同班是备选。</td></tr><tr><td>教师</td><td>选填，多位教师以逗号或顿号分隔。</td></tr><tr><td>周次</td><td>普通精确课程必填；不占时段的实践记录可只填写已知周次。例如 <code>1-5,7-8</code>、<code>1-16周(单)</code>。这是教学周，不是月份或日期。</td></tr><tr><td>星期</td><td>普通精确课程必填，不占时段记录可空，填写 1—7 或周一至周日。</td></tr><tr><td>开始节次、结束节次</td><td>普通精确课程填整数 1—20，结束不得早于开始。第5—6节填 5、6；不占时段记录可空。</td></tr><tr><td>校区、地点</td><td>选填，如南望山校区、东教楼C0108。</td></tr><tr><td>时间类型</td><td>普通课程留空或填“精确时间”；时间未定的实习、实践、课程设计填“不占时段”。同一个班可混合填写两种记录。</td></tr></tbody></table></div>
 <p>模板示例数据需要替换。同一教学班每一行表示都要参加的时段。普通精确课程不能缺少周次、星期或节次；“不占时段”记录可保留已知周次，不需要编造星期或节次。教师或地点为空不妨碍排课。</p>
@@ -48,7 +52,11 @@
 <p>课程和偏好编辑后会自动保存，请看“草稿已自动保存”提示。课程编辑窗口需先点击“保存课程”；尚未提交的弹窗内容不算已保存草稿。</p>
 <p>默认数据目录是 <code>%LOCALAPPDATA%\Keshi</code>，日志在其中的 <code>logs\desktop.log</code>。备份前退出课石，再复制整个数据文件夹。账号不会随便携包自动搬到另一台电脑；需要完整迁移自己的数据文件夹，并避免覆盖目标电脑其他人的数据。</p>
 <p>升级客户端通常不会覆盖原有账号和总库。请完整解压新版，再按需要恢复新版本内置库或自行导入新学期课程。历史结果记录当时的安排，不应拿旧学期结果直接选新学期课程。</p>
+<p><strong>从0.3.1升级到0.3.2：</strong>先保存课程并确认草稿已保存，退出旧版；完整解压0.3.2，运行新文件夹中的 <code>Keshi.exe</code>。如果原来用桌面快捷方式，确认它指向新版程序；只下载新版而仍打开旧快捷方式，运行的仍可能是旧版。默认继续使用同一 Windows 用户的数据，不需要重新注册或重新导入总库。本次下载修复不要求执行“恢复内置总库”。</p>
+<p>生成的方案会保存到当前账号的历史记录。在“候选课表”刷新历史方案后可打开回看；查看历史不等于覆盖当前待排草稿。按具体教学周核对，注意周日补课和不同周次的教室变化。</p>
 <h2 id="questions">十、常见问题与错误处理</h2>
+<h3>“下载标准 Excel 模板”点击没有反应怎么办？</h3><p>0.3.1桌面版存在已确认的下载故障，0.3.2已修复。先核对实际启动的程序版本，可在 <code>Keshi.exe</code> 的“属性—详细信息”查看产品版本，或在 <code>logs\desktop.log</code> 查看最近一次启动版本。若已是0.3.2，先查看保存对话框是否被其他窗口遮挡，再检查是否有登录失效提示；仍无反应请提供版本和操作步骤。</p>
+<p>旧用户急需模板时，可以联网访问 <a href="https://github.com/Guo671/keshi-cug-course-planner/releases/latest" target="_blank" rel="noopener noreferrer">GitHub最新发布页</a>，单独下载附件 <code>keshi-course-template.xlsx</code>；填写后直接用原软件导入，无须重装。如果软件窗口内无法打开外部网页，请将地址 <code>https://github.com/Guo671/keshi-cug-course-planner/releases/latest</code> 复制到 Edge。独立模板仅约5 KB。</p>
 <h3>看到“Available authorizations”“HTTPBearer”怎么办？</h3><p>这是地址以 <code>/api/docs</code> 结尾的开发者接口文档（Swagger），不是普通用户界面。Value 字段用于课石登录生成的访问令牌，不是密码。普通用户关闭这个页面，回到课石窗口操作即可。</p>
 <h3>最多能注册多少账号，能自行注销吗？</h3><p>当前没有人为设定注册账号数量上限，实际能力受本机资源和操作规模影响。压力测试中的25账号验证不代表最大容量。当前没有自助注销或邮箱找回入口；“退出”只结束登录，不删除账号。</p>
 <h3>为什么同名账号不能注册？</h3><p>同一份本地数据库已有这个用户名时会拒绝重复注册。用另一个用户名，或登录原账号。不同密码不能把一个同名账号变成两个账号。</p>
@@ -56,5 +64,5 @@
 <h3>没有结果，是不是课程一定排不开？</h3><p>先区分“已证明无解”和“时限内未找到结果”。检查时间输入、全部候选被排除、必须课程、锁定班、未知时间和教师限制。规模过大时先减少不需要的教学班或分批核对。</p>
 <h3>导入后少了课程怎么办？</h3><p>查看导入计数和未读取文件说明。表格文件数、课程数和教学班数不是同一个概念；同课号可能合并。失败文件应修正或使用标准模板补录，不要凭“导入成功”猜测全部资料都已正确识别。</p>
 <h3>如何报告问题？</h3><p>记录软件版本、操作步骤、错误原文、课程号与教学班号。可提供脱敏后的最小课表文件，说明期望结果和实际结果。不要发送密码或完整个人数据库。</p>
-<small>本说明针对课石 0.3.1。软件是排课辅助工具，测试通过不代表所有未来文件和所有操作组合都已穷尽。</small>
+<small>本说明针对课石 0.3.2，更新于2026年9月14日。软件是排课辅助工具，测试通过不代表所有未来文件和所有操作组合都已穷尽。</small>
 </body></html>
