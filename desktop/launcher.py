@@ -127,6 +127,9 @@ def _run_gui(data_dir: Path | None) -> int:
             # Imported only in GUI mode. Diagnostics and CI never initialize a browser.
             import webview
 
+            # pywebview disables downloads by default, including authenticated blob URLs.
+            # Enable its native Save As dialog before creating the desktop window.
+            webview.settings["ALLOW_DOWNLOADS"] = True
             webview.create_window(
                 APP_TITLE,
                 server.url,

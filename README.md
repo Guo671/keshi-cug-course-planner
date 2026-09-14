@@ -1,10 +1,18 @@
-# 课石 0.3.1
+# 课石 0.3.2
 
 由果果开发，适用于不同学校的本地排课助手。由学生确定本学期想上的课程，课石读取完整教学班时间，按具体教学周检查冲突，生成候选课表。
 
+## 0.3.2 模板下载修复
+
+修复 Windows 桌面版“下载标准 Excel 模板”无反应的问题，下载时会弹出保存对话框。导入课程号或名称不一致的表格时，现在会显示具体行号，并提醒替换或删除示例行。
+
+已使用 0.3.1 的用户不必重装即可继续工作：从 [独立 Excel 模板](https://github.com/Guo671/keshi-cug-course-planner/releases/download/v0.3.2/keshi-course-template.xlsx) 下载模板，填写后用原软件导入。每个文件一门课，同一课程所有行的课程号和名称需一致，可包含多个教学班及多个时段。此模板也随源码提供在 `release/keshi-course-template.xlsx`。
+
+要修复软件内的下载按钮，请完整下载并解压 0.3.2，退出旧版后启动新版。已有本地账号、总库、草稿和历史继续使用，无需重新注册或重新导入。
+
 ## 使用便携版
 
-从 [GitHub Releases 下载课石 0.3.1](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.1)，完整解压 `keshi-v0.3.1-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位及 Edge WebView2 Runtime；不需要安装 Python。
+从 [GitHub Releases 下载课石 0.3.2](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.2)，完整解压 `keshi-v0.3.2-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位及 Edge WebView2 Runtime；不需要安装 Python。
 
 本地账户与学校统一认证账户无关。数据保存在 `%LOCALAPPDATA%\Keshi`，升级客户端会继续使用这里的账号、草稿和历史方案。旧用户首次升级后，在“课程总库管理”点击“恢复本版本内置总库”，即可使用新版课程数据；也可以自行导入新总库。删除总库只删除课程目录，不删除账号和历史。
 

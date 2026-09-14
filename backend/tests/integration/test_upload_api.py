@@ -116,6 +116,23 @@ def test_pdf_file_is_rejected_without_loading_a_pdf_parser(client, auth_headers)
     assert response.status_code == 422
 
 
+def test_template_mixed_course_error_explains_row_and_sample_cleanup(client, auth_headers):
+    from openpyxl import load_workbook
+
+    response = client.get("/api/catalog/template", headers=auth_headers)
+    book = load_workbook(BytesIO(response.content))
+    book.active.cell(3, 2, "另一门课程")
+    output = BytesIO()
+    book.save(output)
+    response = client.post(
+        "/api/catalog/import-courses", headers=auth_headers,
+        files=[("files", ("mixed.xlsx", output.getvalue()))],
+    )
+    assert response.status_code == 422
+    assert "第 3 行" in response.json()["detail"]
+    assert "示例行" in response.json()["detail"]
+
+
 def test_suffix_components_require_confirmation_after_import(client, auth_headers):
     from openpyxl import load_workbook
 

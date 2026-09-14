@@ -67,7 +67,11 @@ def parse_standard_table(
         code = get("课程号") or "自填-" + hashlib.sha256(name.encode()).hexdigest()[:12]
         identities.add((code, name))
         if len(identities) > 1:
-            raise WorkbookImportError("标准模板每个文件填写一门课程，可包含多个教学班和时段")
+            raise WorkbookImportError(
+                f"第 {line} 行的课程号或课程名称与前面的行不一致。"
+                "每个文件只填写一门课程；请统一所有行的课程号和名称，"
+                "并删除未替换的示例行。多门课程请拆成多个文件后一起导入。"
+            )
         non_blocking = get("时间类型").casefold() in {
             "不占时段",
             "不占用时段",

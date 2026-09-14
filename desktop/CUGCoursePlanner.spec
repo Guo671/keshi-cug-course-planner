@@ -80,5 +80,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name="课石-v0.3.1-win64",
+    name="课石-v0.3.2-win64",
 )

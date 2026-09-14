@@ -12,8 +12,10 @@ function bindExtendedCourseEvents() {
       const response = await fetch('/api/catalog/template', {headers:{Authorization:`Bearer ${state.token}`}});
       if (!response.ok) throw new Error('模板下载失败，请重新登录后重试');
       const url = URL.createObjectURL(await response.blob());
-      const link = document.createElement('a');link.href=url;link.download='课石_课程课表模板.xlsx';link.click();
-      setTimeout(()=>URL.revokeObjectURL(url),10000);
+      const link = document.createElement('a');link.href=url;link.download='课石_课程课表模板.xlsx';
+      document.body.appendChild(link);link.click();link.remove();
+      // Keep the blob alive while the desktop Save As dialog is open.
+      setTimeout(()=>URL.revokeObjectURL(url),300000);
     } catch(error) {toast(error.message,true);}
   });
   $("#open-manual-editor").addEventListener("click", () => openCourseEditor());
