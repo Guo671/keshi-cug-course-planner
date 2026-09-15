@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/styles.css" />
     <script src="/app.js" defer></script>
     <script src="/course-editor.js" defer></script>
+    <script src="/memory-actions.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -297,7 +298,7 @@
             <section class="card planning-memory" aria-labelledby="planning-memory-title">
               <div class="panel-title-row">
                 <div><h3 id="planning-memory-title">草稿与最近方案</h3><p id="draft-save-status" class="muted" aria-live="polite">修改课程或约束后自动保存</p></div>
-                <button id="refresh-history" class="text-button" type="button">刷新历史</button>
+                <div class="inline-actions"><button id="save-draft-now" class="text-button" type="button">立即保存草稿</button><button id="delete-draft" class="text-button" type="button">清空并删除草稿</button><button id="refresh-history" class="text-button" type="button">刷新历史</button><button id="clear-history" class="text-button" type="button">删除全部历史</button></div>
               </div>
               <div id="result-stale-alert" class="stale-alert hidden" role="alert"></div>
               <div id="recent-plans" class="recent-plans" aria-live="polite"><p class="muted">登录后读取最近方案…</p></div>

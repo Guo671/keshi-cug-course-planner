@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy import delete
 
 from ..application.planner import generate_schedule
 from ..application.planning_storage import (
@@ -15,6 +16,7 @@ from ..application.planning_storage import (
     read_planning_run,
     save_planning_draft,
 )
+from ..infrastructure.tables import PlanningRun, SavedPreferences
 from .dependencies import CurrentUser, Database
 from .schemas import (
     PlanningDraft,
@@ -26,6 +28,24 @@ from .schemas import (
 )
 
 router = APIRouter(prefix="/plans", tags=["planning"])
+
+
+@router.delete("/draft", status_code=204)
+def delete_draft(db: Database, user: CurrentUser) -> None:
+    db.execute(delete(SavedPreferences).where(SavedPreferences.user_id == user.id))
+
+
+@router.delete("/history", status_code=204)
+def clear_history(db: Database, user: CurrentUser) -> None:
+    db.execute(delete(PlanningRun).where(PlanningRun.user_id == user.id))
+
+
+@router.delete("/history/{run_id}", status_code=204)
+def delete_history(run_id: str, db: Database, user: CurrentUser) -> None:
+    row = db.get(PlanningRun, run_id)
+    if row is None or row.user_id != user.id:
+        raise HTTPException(status_code=404, detail="未找到该历史方案，可能已删除")
+    db.delete(row)
 
 
 @router.get("/draft", response_model=PlanningDraftResponse)

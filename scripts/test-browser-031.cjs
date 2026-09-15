@@ -67,7 +67,7 @@ const deadline=setTimeout(async()=>{console.error('Browser test deadline exceede
  await page.unroute('**/api/catalog/search*');
  // Delay account A's history, then log out and log in as account B.
  let releaseHistory,historyReady=false,held=false;
- await page.route('**/api/plans/history?limit=10',async route=>{
+ await page.route('**/api/plans/history?limit=100',async route=>{
    if(held)return route.continue();held=true;
    const response=await route.fetch();historyReady=true;await new Promise(resolve=>releaseHistory=resolve);await route.fulfill({response});
  });
@@ -80,7 +80,7 @@ const deadline=setTimeout(async()=>{console.error('Browser test deadline exceede
  releaseHistory();await page.waitForTimeout(100);
  assert.equal(await page.evaluate(()=>state.historyRuns.length),0);
  assert.equal(await page.evaluate(()=>state.selectedCourses.size),0);
- await page.unroute('**/api/plans/history?limit=10');
+ await page.unroute('**/api/plans/history?limit=100');
  await page.locator('#profile-college').fill('工程学院');await page.locator('#profile-major').fill('土木工程');await page.locator('#profile-cohort').selectOption('2024');await page.locator('#profile-form button[type=submit]').click();
  await page.waitForFunction(()=>document.querySelector('#profile-status').textContent==='已保存');
  const readCount=await page.evaluate(async()=>{const replies=await Promise.all(Array.from({length:200},()=>api('/api/catalog/status')));return replies.length;});

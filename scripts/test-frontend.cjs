@@ -8,7 +8,7 @@ const vm = require("node:vm");
 
 const appPath = path.join(__dirname, "..", "frontend", "app.js");
 const source = `${fs.readFileSync(appPath, "utf8")}
-globalThis.frontendUnderTest = { formatPlanSetSummary, PLANNING_RESULT_LIMIT };`;
+globalThis.frontendUnderTest = { formatPlanSetSummary, PLANNING_RESULT_LIMIT, parseStoredDate };`;
 const context = {
   document: { addEventListener() {} },
   localStorage: { getItem() { return null; } },
@@ -88,4 +88,12 @@ test("keeps old history readable without claiming exhaustive enumeration", () =>
   const summary = formatPlanSetSummary({ status: "optimal", plans: plans(5) });
   assert.equal(summary.kind, "unknown");
   assert.equal(summary.text, "此历史结果包含 5 种可行排课方式；旧记录未保存是否已经列完");
+});
+
+test('SQLite UTC dates and explicit offsets represent the same instant',()=>{
+ const parse=context.frontendUnderTest.parseStoredDate;
+ assert.equal(parse('2026-09-15T13:24:15').toISOString(),'2026-09-15T13:24:15.000Z');
+ assert.equal(parse('2026-09-15 13:24:15').toISOString(),'2026-09-15T13:24:15.000Z');
+ assert.equal(parse('2026-09-15T21:24:15+08:00').toISOString(),'2026-09-15T13:24:15.000Z');
+ assert.ok(Number.isNaN(parse('broken').getTime()));
 });

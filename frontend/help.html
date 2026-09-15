@@ -4,8 +4,8 @@
 :root{font-family:"Microsoft YaHei UI","Microsoft YaHei",sans-serif;color:#263b35;background:#fffefa;line-height:1.85}*{box-sizing:border-box}body{max-width:1000px;margin:auto;padding:24px 30px 60px}h1,h2,h3{line-height:1.4}h1{color:#20594d;margin:0 0 12px}h2{margin:36px 0 14px;padding-top:14px;border-top:1px solid #d8e5df;color:#20594d}h3{margin-bottom:8px;font-size:17px}p{margin:10px 0}nav{display:flex;gap:10px;flex-wrap:wrap;padding:18px;background:#edf5f8;border-radius:14px}nav a{background:white;padding:6px 12px;border-radius:8px;color:#246584;text-decoration:none;border:1px solid #d4e6ed}a:focus-visible{outline:3px solid #528bc2}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{padding:10px 12px;border:1px solid #d6e0da;text-align:left;vertical-align:top}th{background:#eaf2ed;color:#20594d}.table-wrap{overflow:auto}.note{background:#f0f7f9;border-left:4px solid #68a8c1;padding:13px 18px;margin:18px 0;border-radius:8px}code{overflow-wrap:anywhere;background:#f0f1ed;padding:2px 5px;border-radius:4px}li{margin:7px 0}small{color:#596e64}@media(max-width:540px){body{padding:18px 16px 40px;font-size:14px}h1{font-size:25px}h2{font-size:21px}th,td{padding:8px}nav{padding:12px;gap:8px}}@media print{nav{display:none}body{max-width:none;padding:0}h2{break-after:avoid}}
 </style></head><body>
 <h1>课石使用说明</h1><p><strong>由果果开发 · 适用于不同学校的本地排课工具</strong></p>
-<p><strong>适用版本：0.3.3 · 说明更新：2026年9月15日</strong></p>
-<div class="note"><strong>最新修复：</strong>0.3.3 修复连续点击不同课程修改入口时，慢响应覆盖新编辑窗口的问题。<br><strong>此前修复：</strong>0.3.2 已修复桌面版“下载标准 Excel 模板”点击无反应的问题。点击后应弹出保存文件对话框，选择位置并保存。只更新 GitHub 下载包不会自动更新电脑中已经安装的旧版；升级时需要完整解压新版并启动新版程序。</div>
+<p><strong>适用版本：0.3.4 · 说明更新：2026年9月15日</strong></p>
+<div class="note"><strong>0.3.4新增：</strong>草稿立即保存、删除草稿、删除单条或全部历史。删除有确认并按当前账号隔离。<br><strong>此前修复：</strong>0.3.3 修复连续点击不同课程修改入口时，慢响应覆盖新编辑窗口的问题。<br><strong>此前修复：</strong>0.3.2 已修复桌面版“下载标准 Excel 模板”点击无反应的问题。点击后应弹出保存文件对话框，选择位置并保存。只更新 GitHub 下载包不会自动更新电脑中已经安装的旧版；升级时需要完整解压新版并启动新版程序。</div>
 <p>本说明随软件保存在电脑中，断网也能打开。课石帮助你在已经确定要修读的课程之间选择教学班、核对时间并生成候选课表。正式选课仍须在学校教务系统完成。</p>
 <nav aria-label="说明目录"><a href="#quick">快速开始</a><a href="#accounts">账号与离线使用</a><a href="#catalog">课程总库</a><a href="#import">Excel 导入</a><a href="#manual">手动编辑</a><a href="#preferences">排课偏好</a><a href="#results">查看结果</a><a href="#leave">请假与删课建议</a><a href="#storage">保存与升级</a><a href="#questions">常见问题</a></nav>
 <h2 id="quick">一、第一次使用</h2>
@@ -54,6 +54,8 @@
 <p>升级客户端通常不会覆盖原有账号和总库。请完整解压新版，再按需要恢复新版本内置库或自行导入新学期课程。历史结果记录当时的安排，不应拿旧学期结果直接选新学期课程。</p>
 <p><strong>从0.3.1升级到0.3.2：</strong>先保存课程并确认草稿已保存，退出旧版；完整解压0.3.2，运行新文件夹中的 <code>Keshi.exe</code>。如果原来用桌面快捷方式，确认它指向新版程序；只下载新版而仍打开旧快捷方式，运行的仍可能是旧版。默认继续使用同一 Windows 用户的数据，不需要重新注册或重新导入总库。本次下载修复不要求执行“恢复内置总库”。</p>
 <p>生成的方案会保存到当前账号的历史记录。在“候选课表”刷新历史方案后可打开回看；查看历史不等于覆盖当前待排草稿。按具体教学周核对，注意周日补课和不同周次的教室变化。</p>
+<h3>如何保存、清理草稿和历史</h3>
+<ul><li>“立即保存草稿”：立即保存当前课程与偏好；正常情况下仍会自动保存。</li><li>“清空并删除草稿”：确认后删除当前账号的草稿，并清空页面上的待排课程与偏好。保留学生信息、历史方案和课程总库。课程编辑窗口里尚未提交的内容也不会保留。</li><li>每条历史旁的“删除”：删除该次排课记录及其中所有候选方案，不影响当前草稿或总库。</li><li>“删除全部历史”：删除当前账号全部历史，包括最近100条以外的记录，不影响其他账号。</li><li>以上删除不可撤销；不确定时请选择取消。正在排课或导入、恢复草稿时请等待完成；删除期间请勿重复操作。</li><li>删除草稿后再添加课程或修改偏好，会创建新草稿；删除失败时当前课程保留，可稍后重试。</li><li>“待排课程—清空”只清空课程并自动保存，保留偏好；它与删除整个草稿不同。</li></ul>
 <h2 id="questions">十、常见问题与错误处理</h2>
 <h3>“下载标准 Excel 模板”点击没有反应怎么办？</h3><p>0.3.1桌面版存在已确认的下载故障，0.3.2已修复。先核对实际启动的程序版本，可在 <code>Keshi.exe</code> 的“属性—详细信息”查看产品版本，或在 <code>logs\desktop.log</code> 查看最近一次启动版本。若已是0.3.2，先查看保存对话框是否被其他窗口遮挡，再检查是否有登录失效提示；仍无反应请提供版本和操作步骤。</p>
 <p>旧用户急需模板时，可以联网访问 <a href="https://github.com/Guo671/keshi-cug-course-planner/releases/latest" target="_blank" rel="noopener noreferrer">GitHub最新发布页</a>，单独下载附件 <code>keshi-course-template.xlsx</code>；填写后直接用原软件导入，无须重装。如果软件窗口内无法打开外部网页，请将地址 <code>https://github.com/Guo671/keshi-cug-course-planner/releases/latest</code> 复制到 Edge。独立模板仅约5 KB。</p>
@@ -64,5 +66,5 @@
 <h3>没有结果，是不是课程一定排不开？</h3><p>先区分“已证明无解”和“时限内未找到结果”。检查时间输入、全部候选被排除、必须课程、锁定班、未知时间和教师限制。规模过大时先减少不需要的教学班或分批核对。</p>
 <h3>导入后少了课程怎么办？</h3><p>查看导入计数和未读取文件说明。表格文件数、课程数和教学班数不是同一个概念；同课号可能合并。失败文件应修正或使用标准模板补录，不要凭“导入成功”猜测全部资料都已正确识别。</p>
 <h3>如何报告问题？</h3><p>记录软件版本、操作步骤、错误原文、课程号与教学班号。可提供脱敏后的最小课表文件，说明期望结果和实际结果。不要发送密码或完整个人数据库。</p>
-<small>本说明针对课石 0.3.3，更新于2026年9月15日。软件是排课辅助工具，测试通过不代表所有未来文件和所有操作组合都已穷尽。</small>
+<small>本说明针对课石 0.3.4，更新于2026年9月15日。软件是排课辅助工具，测试通过不代表所有未来文件和所有操作组合都已穷尽。</small>
 </body></html>

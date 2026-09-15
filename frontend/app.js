@@ -45,7 +45,7 @@ function bindEvents() {
   $("#selection-phase").addEventListener("change", updateRetakeConfirmation);
   $("#course-search-button").addEventListener("click", searchCourses);
   $("#course-search").addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); searchCourses(); } });
-  $("#clear-courses").addEventListener("click", () => { state.selectedCourses.clear(); renderSelectedCourses(); scheduleDraftSave(); });
+  $("#clear-courses").addEventListener("click", () => { if (!state.selectedCourses.size) return toast("待排课程已经为空"); if (!confirm("清空待排课程？保留排课偏好、历史方案和课程总库。")) return; state.selectedCourses.clear(); renderSelectedCourses(); scheduleDraftSave(); });
   $("#blocked-time-form").addEventListener("submit", addBlockedTime);
   $("#teacher-rule-form").addEventListener("submit", addTeacherRule);
   $("#generate-plan").addEventListener("click", generatePlan);
@@ -217,6 +217,7 @@ function resetUserState() {
   state.historyRuns = [];
   state.currentResultMeta = null;
   state.draftRestoreInProgress = false;
+  state.draftRestorePending = false;
   state.draftSaveTimer = null;
   state.draftWriteBlocked = false;
   $("#profile-form")?.reset();
@@ -797,6 +798,11 @@ function scheduleDraftSave() {
 }
 
 let draftSaveTail = Promise.resolve();
+function parseStoredDate(value) {
+  // SQLite returns UTC timestamps without a suffix; do not interpret them as local time.
+  const text = String(value || '');
+  return new Date(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(text) ? text.replace(' ', 'T') + 'Z' : text);
+}
 function savePlanningDraft(options = {}) {
   const token = state.token;
   const job = draftSaveTail.catch(() => null).then(() => {
@@ -817,7 +823,7 @@ async function persistPlanningDraft({ silent = false, force = false } = {}) {
       method: "PUT",
       body: JSON.stringify(buildPlanningPayload({ forDraft: true })),
     });
-    const savedAt = new Date(response.updated_at);
+    const savedAt = parseStoredDate(response.updated_at);
     $("#draft-save-status").textContent = `草稿已自动保存 · ${Number.isNaN(savedAt.getTime()) ? "刚刚" : savedAt.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
     return response;
   } catch (error) {
@@ -829,6 +835,12 @@ async function persistPlanningDraft({ silent = false, force = false } = {}) {
 }
 
 async function restorePlanningDraft() {
+  const token=state.token;state.draftRestorePending=true;
+  try { return await restorePlanningDraftData(); }
+  finally { if(token===state.token) state.draftRestorePending=false; }
+}
+
+async function restorePlanningDraftData() {
   if (!state.token) return;
   let response;
   try {
@@ -885,7 +897,7 @@ async function restorePlanningDraft() {
         .filter((sectionId) => forbidden.has(sectionId) && sectionId !== course.locked_section_id);
     });
     renderSelectedCourses();
-    const restoredAt = new Date(response.updated_at);
+    const restoredAt = parseStoredDate(response.updated_at);
     $("#draft-save-status").textContent = `已恢复草稿 · ${Number.isNaN(restoredAt.getTime()) ? "时间未知" : restoredAt.toLocaleString("zh-CN")}`;
     if (response.catalog_is_stale) {
       showStaleAlert(response.stale_reason || "课程总库已更新；已恢复的草稿需要重新检查教学班并求解。");
@@ -895,14 +907,18 @@ async function restorePlanningDraft() {
   }
 }
 
+let historyRequestId = 0;
 async function loadPlanningHistory() {
   if (!state.token) return;
+  const requestId = ++historyRequestId;
   $("#recent-plans").innerHTML = '<p class="muted">正在读取最近方案…</p>';
   try {
-    state.historyRuns = await api("/api/plans/history?limit=10");
+    const runs = await api("/api/plans/history?limit=100");
+    if (requestId !== historyRequestId) return;
+    state.historyRuns = runs;
     renderPlanningHistory();
   } catch (error) {
-    if (error.staleSession) return;
+    if (error.staleSession || requestId !== historyRequestId) return;
     $("#recent-plans").innerHTML = `<p class="form-error">历史方案读取失败：${escapeHtml(error.message)}</p>`;
   }
 }
@@ -915,12 +931,12 @@ function renderPlanningHistory() {
   }
   const modeLabels = { manual: "课程排课", curriculum: "旧版记录", mixed: "旧版记录" };
   container.innerHTML = state.historyRuns.map((run) => {
-    const createdAt = new Date(run.created_at);
+    const createdAt = parseStoredDate(run.created_at);
     const time = Number.isNaN(createdAt.getTime()) ? "时间未知" : createdAt.toLocaleString("zh-CN");
-    return `<button type="button" class="history-run${run.catalog_is_stale ? " is-stale" : ""}" data-history-run-id="${escapeAttribute(run.run_id)}">
+    return `<div class="history-entry"><button type="button" class="history-run${run.catalog_is_stale ? " is-stale" : ""}" data-history-run-id="${escapeAttribute(run.run_id)}">
       <span><strong>${escapeHtml(modeLabels[run.input_mode] || run.input_mode)} · ${run.scheduled_course_count} 门</strong><small>${escapeHtml(time)} · ${run.plan_count} 个方案</small></span>
       <span class="history-status">${run.catalog_is_stale ? "课程库已更新" : "打开"}</span>
-    </button>`;
+    </button><button type="button" class="text-button" data-delete-history="${escapeAttribute(run.run_id)}" aria-label="删除 ${escapeAttribute(time)} 的历史方案">删除</button></div>`;
   }).join("");
 }
 
@@ -939,7 +955,7 @@ async function openHistoryRun(runId) {
     renderPlanResults();
     $("#result-step").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (error) {
-    if (error.staleSession) return;
+    if (error.staleSession || requestId !== state.resultRequestId) return;
     $("#plan-results").innerHTML = `<div class="diagnostic">历史方案读取失败：${escapeHtml(error.message)}</div>`;
   }
 }
