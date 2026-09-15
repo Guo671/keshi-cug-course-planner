@@ -15,8 +15,8 @@ $SeedDatabase = Join-Path $DesktopBuildRoot 'seed\planner.db'
 # Windows PowerShell 5.1 reads BOM-less scripts as the active ANSI code page.
 # Build the Chinese product name from Unicode code points so this script remains ASCII-safe.
 $ProductName = [string][char]0x8BFE + [string][char]0x77F3
-$BundleName = "$ProductName-v0.3.2-win64"
-$ReleaseFileName = 'keshi-v0.3.2-win64.zip'
+$BundleName = "$ProductName-v0.3.3-win64"
+$ReleaseFileName = 'keshi-v0.3.3-win64.zip'
 $BundleDir = Join-Path $DistRoot $BundleName
 $ReleaseDir = Join-Path $ProjectRoot 'release'
 $ZipPath = Join-Path $ReleaseDir $ReleaseFileName
@@ -107,7 +107,7 @@ try {
         throw "Missing frozen executable: $ExePath"
     }
     $VersionOutput = & $ExePath --version
-    if ($LASTEXITCODE -ne 0 -or ($VersionOutput -join '').Trim() -ne 'Keshi 0.3.2') {
+    if ($LASTEXITCODE -ne 0 -or ($VersionOutput -join '').Trim() -ne 'Keshi 0.3.3') {
         throw "Frozen version check failed: $VersionOutput"
     }
 

@@ -1,6 +1,7 @@
 "use strict";
 
 let editingCourseId = null;
+let courseEditorRequestId = 0;
 function bindExtendedCourseEvents() {
   $$('[data-open-help]').forEach(button=>button.addEventListener('click',()=>{
     if (!$("#help-frame").getAttribute('src')) $("#help-frame").src='/help.html';
@@ -81,16 +82,20 @@ function customCourseDetail(course) {
 }
 
 async function openCourseEditor(courseId = null) {
-  editingCourseId = courseId;
+  const requestId = ++courseEditorRequestId;
+  const token = state.token;
   const course = courseId ? state.selectedCourses.get(courseId) : null;
+  if (courseId && !course) return;
   let custom = course?.custom;
   if (course && !custom) {
     const detail = await ensureCourseDetail(courseId);
+    if (requestId !== courseEditorRequestId || token !== state.token || state.selectedCourses.get(courseId) !== course) return;
     if (!detail) return toast("无法读取课程，请重试", true);
     custom = {name: course.name, code: course.code, component_relationship_confirmed: !detail.component_review_required, sections: detail.sections.map((s, i) => ({
       id: String(i), section_code: s.section_code, instructors: s.instructors, meetings: s.meetings,
     }))};
   }
+  editingCourseId = courseId;
   $("#custom-name").value = custom?.name || "";
   $("#custom-code").value = custom?.code || "";
   $("#custom-error").textContent = "";

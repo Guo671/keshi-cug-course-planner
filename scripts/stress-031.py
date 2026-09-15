@@ -213,11 +213,11 @@ def workbook(code='90000000'):
     output=BytesIO();book.save(output);return output.getvalue()
 
 
-def suite_import():
+def suite_import(real_cycles=3, synthetic_count=5000):
     with tempfile.TemporaryDirectory(dir=OUT,prefix='imports-') as directory,api_context(directory) as client:
         h=register(client,'import_stress');cycles=[]
         real=[('files',(f'课程课表 ({i}).zip',(Path(os.environ.get('KESHI_CATALOG_INPUT', str(ROOT.parents[1]/'资料/2026秋课程总库')))/f'课程课表 ({i}).zip').read_bytes())) for i in (1,2,3)]
-        for i in range(3):
+        for i in range(real_cycles):
             start=time.perf_counter();r=client.post('/api/catalog/import',headers=h,files=real)
             assert r.status_code==200,r.text[:500]
             assert r.json()['courses']==1212 and r.json()['sections']==3318,r.text[:500]
@@ -226,6 +226,9 @@ def suite_import():
             assert failed.status_code==422
             assert client.get('/api/catalog/status',headers=h).json()['snapshots']==before
             cycles.append(round(time.perf_counter()-start,3))
+            print(f"real import cycle {i+1} complete",flush=True)
+        if not synthetic_count:
+            return {"real_1212_course_import_replace_cycles":real_cycles,"cycle_wall_seconds":cycles,"atomic_failure_checks":real_cycles}
         files=[]
         for package in range(5):
             archive=BytesIO()
@@ -234,6 +237,7 @@ def suite_import():
                     code=str(91000000+package*1000+i)
                     z.writestr(f'课表/{code}.xlsx',workbook(code))
             files.append(('files',(f'part{package}.zip',archive.getvalue())))
+        print("5000 synthetic workbooks prepared; beginning import",flush=True)
         start=time.perf_counter();r=client.post('/api/catalog/import',headers=h,files=files)
         assert r.status_code==200,r.text[:500]
         assert r.json()['courses']==5000 and r.json()['sections']==5000,r.text[:500]
@@ -241,8 +245,8 @@ def suite_import():
         assert client.delete('/api/catalog',headers=h).status_code==204
         assert client.get('/api/catalog/status',headers=h).json()['course_count']==0
         assert client.get('/api/auth/me',headers=h).status_code==200
-        return {'real_1212_course_import_replace_cycles':3,'cycle_wall_seconds':cycles,
-                'atomic_failure_checks':3,'synthetic_workbooks_in_5_zips':5000,'synthetic_import_seconds':elapsed}
+        return {'real_1212_course_import_replace_cycles':real_cycles,'cycle_wall_seconds':cycles,
+                'atomic_failure_checks':real_cycles,'synthetic_workbooks_in_5_zips':5000,'synthetic_import_seconds':elapsed}
 
 
 def suite_malformed():
@@ -309,7 +313,7 @@ def suite_non_blocking():
     return {'mixed_exact_and_non_blocking_problems':300,'independently_checked_plans':validated}
 
 
-SUITES={'oracle':suite_oracle,'leave':suite_leave,'scale':suite_scale,'accounts':suite_accounts,'import':suite_import,'malformed':suite_malformed,'non_blocking':suite_non_blocking}
+SUITES={'oracle':suite_oracle,'leave':suite_leave,'scale':suite_scale,'accounts':suite_accounts,'import':suite_import,'import_real':lambda:suite_import(synthetic_count=0),'import_synthetic':lambda:suite_import(real_cycles=0),'malformed':suite_malformed,'non_blocking':suite_non_blocking}
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('suite',choices=SUITES);args=parser.parse_args()
     start=time.perf_counter();data=SUITES[args.suite]();data['wall_seconds']=round(time.perf_counter()-start,3)
