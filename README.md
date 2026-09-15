@@ -1,6 +1,10 @@
-# 课石 0.3.4
+# 课石 0.3.5
 
 由果果开发，适用于不同学校的本地排课助手。由学生确定本学期想上的课程，课石读取完整教学班时间，按具体教学周检查冲突，生成候选课表。
+
+## 0.3.5 保存与退出保护
+
+修复保存课程后立即退出账号可能丢失最后修改的问题。退出前等待未落盘草稿保存，失败时可取消退出或明确放弃修改。浏览器刷新/离开时对未保存草稿请求提示；强制结束进程、断电等仍不能保证落盘。旧保存响应不会把更新的修改误报为已保存。
 
 ## 0.3.4 草稿与历史管理
 
@@ -20,7 +24,7 @@
 
 ## 使用便携版
 
-从 [GitHub Releases 下载课石 0.3.4](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.4)，完整解压 `keshi-v0.3.4-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位及 Edge WebView2 Runtime；不需要安装 Python。
+从 [GitHub Releases 下载课石 0.3.5](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.5)，完整解压 `keshi-v0.3.5-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位及 Edge WebView2 Runtime；不需要安装 Python。
 
 本地账户与学校统一认证账户无关。数据保存在 `%LOCALAPPDATA%\Keshi`，升级客户端会继续使用这里的账号、草稿和历史方案。旧用户首次升级后，在“课程总库管理”点击“恢复本版本内置总库”，即可使用新版课程数据；也可以自行导入新总库。删除总库只删除课程目录，不删除账号和历史。
 

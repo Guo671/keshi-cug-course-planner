@@ -42,6 +42,7 @@ async function deleteCurrentDraft(){
     $('#course-editor').close();editingCourseId=null;courseEditorRequestId++;
     renderSelectedCourses();renderRules();clearDisplayedPlan();
     state.draftWriteBlocked=false;
+    state.draftRevision=state.savedDraftRevision=0;
     $('#draft-save-status').textContent='草稿已删除；添加课程或修改偏好后会创建新草稿';
     toast('草稿已删除，历史方案和总库已保留');
   }catch(error){if(!error.staleSession){state.draftWriteBlocked=wasBlocked;toast(`草稿删除失败：${error.message}`,true);}}

@@ -16,6 +16,8 @@ const state = {
   currentResultMeta: null,
   draftRestoreInProgress: false,
   draftSaveTimer: null,
+  draftRevision: 0,
+  savedDraftRevision: 0,
   draftWriteBlocked: false,
   viewWeek: 0,
   currentPlanIndex: 0,
@@ -29,6 +31,9 @@ const weekdayNames = ["", "周一", "周二", "周三", "周四", "周五", "周
 const PLANNING_RESULT_LIMIT = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener('beforeunload',event=>{
+    if(state.token && state.draftRevision!==state.savedDraftRevision){event.preventDefault();event.returnValue='';}
+  });
   bindEvents();
   initializeStepNavigation();
   if (state.token) bootstrapApp();
@@ -182,10 +187,21 @@ function showAuth() {
   window.scrollTo(0, 0);
 }
 
+let logoutInProgress = false;
 async function logout() {
-  try { await api("/api/auth/logout", { method: "POST" }); } catch (_) { /* local token is cleared regardless */ }
-  clearSession();
-  showAuth();
+  if(logoutInProgress)return;
+  const token=state.token;
+  logoutInProgress=true;$('#app-shell').inert=true;
+  try {
+    if(state.draftRevision!==state.savedDraftRevision){
+      const saved=await savePlanningDraft({silent:true});
+      if(token!==state.token)return;
+      if(!saved && !confirm('草稿未能保存。要放弃未保存的修改并退出吗？\n选择取消可留在当前页面重试保存。'))return;
+    }
+    try { await api("/api/auth/logout", { method: "POST" }); } catch (_) { /* local token is cleared regardless */ }
+    if(token!==state.token)return;
+    clearSession();showAuth();
+  } finally {logoutInProgress=false;$('#app-shell').inert=false;}
 }
 
 function clearSession() {
@@ -206,6 +222,7 @@ function resetUserState() {
   for (const selector of ['#auth-password','#auth-username','#custom-name','#custom-code','#catalog-files','#direct-course-files']) $(selector).value = '';
   clearTimeout(state.draftSaveTimer);
   state.profile = null;
+  state.draftRevision = state.savedDraftRevision = 0;
   state.catalog = null;
   state.inputMode = "manual";
   state.selectedCourses = new Map();
@@ -792,6 +809,7 @@ function scheduleDraftSave() {
     showResultStaleness(state.currentResultMeta);
   }
   if (!state.token || state.draftRestoreInProgress || state.draftWriteBlocked) return;
+  state.draftRevision++;
   clearTimeout(state.draftSaveTimer);
   $("#draft-save-status").textContent = "有未保存的修改…";
   state.draftSaveTimer = setTimeout(() => { void savePlanningDraft(); }, 750);
@@ -818,13 +836,15 @@ async function persistPlanningDraft({ silent = false, force = false } = {}) {
   clearTimeout(state.draftSaveTimer);
   state.draftSaveTimer = null;
   $("#draft-save-status").textContent = "正在保存草稿…";
+  const revision = state.draftRevision;
   try {
     const response = await api("/api/plans/draft", {
       method: "PUT",
       body: JSON.stringify(buildPlanningPayload({ forDraft: true })),
     });
     const savedAt = parseStoredDate(response.updated_at);
-    $("#draft-save-status").textContent = `草稿已自动保存 · ${Number.isNaN(savedAt.getTime()) ? "刚刚" : savedAt.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
+    state.savedDraftRevision = revision;
+    $("#draft-save-status").textContent = state.draftRevision!==revision ? '有更新的修改尚未保存…' : `草稿已自动保存 · ${Number.isNaN(savedAt.getTime()) ? "刚刚" : savedAt.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
     return response;
   } catch (error) {
     if (error.staleSession) return;
