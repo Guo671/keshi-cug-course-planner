@@ -40,7 +40,11 @@ class BrowserSession:
                 token = payload.get("token") if isinstance(payload, dict) else None
             except (ValueError, UnicodeError):
                 return Response(status_code=400)
-            if not isinstance(token, str) or not hmac.compare_digest(token, self.token):
+            if (
+                not isinstance(token, str)
+                or not token.isascii()
+                or not hmac.compare_digest(token, self.token)
+            ):
                 return Response(status_code=403)
             self.ready.set()
             return Response(status_code=204)

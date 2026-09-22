@@ -50,6 +50,7 @@ def test_browser_ready_requires_matching_origin_and_secret():
     with TestClient(app) as client:
         assert client.post('/_keshi/browser-ready',json={'token':session.token},headers={'Origin':'https://evil.test'}).status_code==403
         assert client.post('/_keshi/browser-ready',json={'token':'wrong'},headers={'Origin':'http://127.0.0.1:18765'}).status_code==403
+        assert client.post('/_keshi/browser-ready',json={'token':'错误令牌'},headers={'Origin':'http://127.0.0.1:18765'}).status_code==403
         assert not session.ready.is_set()
         assert client.post('/_keshi/browser-ready',json={'token':session.token},headers={'Origin':'http://127.0.0.1:18765'}).status_code==204
         assert session.ready.is_set()
