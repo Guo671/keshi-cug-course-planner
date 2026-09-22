@@ -88,6 +88,8 @@ class RuntimePaths:
             self.static_dir / "index.html",
             self.static_dir / "app.js",
             self.static_dir / "course-editor.js",
+            self.static_dir / "memory-actions.js",
+            self.static_dir / "browser-compat.js",
             self.static_dir / "help.html",
             self.static_dir / "styles.css",
             self.seed_database_path,
@@ -228,21 +230,25 @@ def reserve_backend_socket(preferred_port: int = PREFERRED_PORT) -> ReservedSock
 class BackendServer:
     """Uvicorn in a managed thread using a socket reserved by the launcher."""
 
-    def __init__(self, reserved_socket: ReservedSocket) -> None:
+    def __init__(self, reserved_socket: ReservedSocket, browser_session: Any = None) -> None:
         self.reserved_socket = reserved_socket
         self.port = reserved_socket.port
         self.url = f"http://127.0.0.1:{self.port}"
         self._server: Any | None = None
         self._thread: threading.Thread | None = None
         self._failure: BaseException | None = None
+        self.browser_session = browser_session
 
     def _serve(self) -> None:
         try:
             import uvicorn
             from app.main import create_app
 
+            application = create_app()
+            if self.browser_session is not None:
+                self.browser_session.attach(application, self.url)
             config = uvicorn.Config(
-                create_app(),
+                application,
                 loop="asyncio",
                 http="h11",
                 ws="none",
@@ -257,7 +263,7 @@ class BackendServer:
         except BaseException as exc:  # thread boundary; re-raised on the launcher thread
             self._failure = exc
 
-    def start(self, timeout_seconds: float = 20.0) -> dict[str, str]:
+    def start(self, timeout_seconds: float = 45.0) -> dict[str, str]:
         self._thread = threading.Thread(target=self._serve, name="keshi-backend", daemon=True)
         self._thread.start()
         deadline = time.monotonic() + timeout_seconds
@@ -274,7 +280,11 @@ class BackendServer:
                     return {str(key): str(value) for key, value in payload.items()}
             except (OSError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
                 time.sleep(0.08)
-        raise DesktopRuntimeError("本地服务启动超时。请查看日志或重新启动课石。")
+        raise DesktopRuntimeError(
+            "本地服务在45秒内未就绪。首次启动可能受磁盘或安全扫描影响。"
+            "请确认完整解压，稍后再试；若重复失败，请提供 logs\\desktop.log，"
+            "不要反复双击或关闭安全保护。"
+        )
 
     def stop(self, timeout_seconds: float = 10.0) -> None:
         server = self._server
@@ -367,19 +377,25 @@ def webview2_runtime_available() -> bool:
         base = os.environ.get(environment_name)
         if base:
             candidates.append(Path(base) / "Microsoft" / "EdgeWebView" / "Application")
-    if any(path.is_dir() and any(path.iterdir()) for path in candidates):
-        return True
+    for path in candidates:
+        try:
+            if path.is_dir() and any(
+                (version / "msedgewebview2.exe").is_file() for version in path.iterdir()
+            ):
+                return True
+        except OSError:
+            continue
     try:
         import winreg
 
-        client_id = "{F1E7E10E-6B6D-4F1E-92D1-89E74C7FBE2F}"
+        client_id = "{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
         for hive in (winreg.HKEY_CURRENT_USER, winreg.HKEY_LOCAL_MACHINE):
             for prefix in ("Software", "Software\\WOW6432Node"):
                 key_path = f"{prefix}\\Microsoft\\EdgeUpdate\\Clients\\{client_id}"
                 try:
                     with winreg.OpenKey(hive, key_path) as key:
                         version, _ = winreg.QueryValueEx(key, "pv")
-                    if version:
+                    if isinstance(version, str) and version.strip() not in ("", "0.0.0.0"):
                         return True
                 except OSError:
                     continue
@@ -400,9 +416,8 @@ def smoke_test(paths: RuntimePaths) -> dict[str, object]:
         health = server.start()
         from io import BytesIO
 
-        from openpyxl import Workbook, load_workbook
-
         from app.scheduling.solver import cp_model
+        from openpyxl import Workbook, load_workbook
 
         if cp_model is None:
             raise DesktopRuntimeError("便携包缺少 CP-SAT 求解器")

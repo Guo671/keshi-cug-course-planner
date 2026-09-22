@@ -15,8 +15,8 @@ $SeedDatabase = Join-Path $DesktopBuildRoot 'seed\planner.db'
 # Windows PowerShell 5.1 reads BOM-less scripts as the active ANSI code page.
 # Build the Chinese product name from Unicode code points so this script remains ASCII-safe.
 $ProductName = [string][char]0x8BFE + [string][char]0x77F3
-$BundleName = "$ProductName-v0.3.5-win64"
-$ReleaseFileName = 'keshi-v0.3.5-win64.zip'
+$BundleName = "$ProductName-v0.3.6-win64"
+$ReleaseFileName = 'keshi-v0.3.6-win64.zip'
 $BundleDir = Join-Path $DistRoot $BundleName
 $ReleaseDir = Join-Path $ProjectRoot 'release'
 $ZipPath = Join-Path $ReleaseDir $ReleaseFileName
@@ -97,6 +97,9 @@ try {
     }
     Copy-Item -LiteralPath (Join-Path $ProjectRoot 'desktop\PORTABLE_README.txt') `
         -Destination (Join-Path $BundleDir 'README.txt') -Force
+    foreach ($Starter in @('Start-in-browser.cmd', 'Try-desktop-window.cmd')) {
+        Copy-Item -LiteralPath (Join-Path $ProjectRoot "desktop\$Starter") -Destination $BundleDir
+    }
     foreach ($NoticeFile in @('LICENSE', 'DATA_NOTICE.md', 'THIRD_PARTY_NOTICES.md')) {
         Copy-Item -LiteralPath (Join-Path $ProjectRoot $NoticeFile) `
             -Destination (Join-Path $BundleDir $NoticeFile) -Force
@@ -107,7 +110,7 @@ try {
         throw "Missing frozen executable: $ExePath"
     }
     $VersionOutput = & $ExePath --version
-    if ($LASTEXITCODE -ne 0 -or ($VersionOutput -join '').Trim() -ne 'Keshi 0.3.5') {
+    if ($LASTEXITCODE -ne 0 -or ($VersionOutput -join '').Trim() -ne 'Keshi 0.3.6') {
         throw "Frozen version check failed: $VersionOutput"
     }
 
@@ -118,6 +121,14 @@ try {
     $SmokeResult = ($SmokeOutput -join "`n") | ConvertFrom-Json
     if ($SmokeResult.status -ne 'ok' -or -not $SmokeResult.frozen -or $SmokeResult.health.status -ne 'ok') {
         throw "Frozen smoke test returned an invalid result: $SmokeOutput"
+    }
+
+    # Unlike the backend-only smoke check, this renders the real packaged page.
+    $UiOutput = & $ExePath --check-ui auto
+    if ($LASTEXITCODE -ne 0) { throw 'Frozen UI initialization check failed.' }
+    $UiResult = ($UiOutput -join "`n") | ConvertFrom-Json
+    if ($UiResult.status -ne 'ok' -or -not $UiResult.frozen -or -not $UiResult.page_loaded) {
+        throw "Frozen UI check did not confirm page loading: $UiOutput"
     }
 
     New-Item -ItemType Directory -Path $ReleaseDir -Force | Out-Null

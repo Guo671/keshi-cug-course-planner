@@ -15,6 +15,12 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from desktop import APP_NAME, APP_TITLE, APP_VERSION
+from desktop.browser_mode import (
+    BrowserSession,
+    prefer_browser,
+    run_browser_mode,
+    window_dependency_blocked,
+)
 from desktop.runtime import (
     BackendServer,
     DesktopRuntimeError,
@@ -32,6 +38,14 @@ LOGGER = logging.getLogger("keshi.desktop")
 def _argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=f"{APP_TITLE} Windows 桌面程序")
     parser.add_argument("--version", action="store_true", help="显示版本后退出")
+    parser.add_argument(
+        "--check-ui",
+        choices=["native", "edge", "chrome", "auto"],
+        help="在隔离目录验证真实界面；仅用于诊断和发布验证",
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--browser", action="store_true", help="直接在Edge/Chrome中使用本机课石")
+    mode.add_argument("--desktop", action="store_true", help="优先重试原桌面窗口，失败仍转兼容模式")
     parser.add_argument(
         "--smoke-test",
         action="store_true",
@@ -53,9 +67,7 @@ def _configure_logging(paths: RuntimePaths) -> None:
         backupCount=3,
         encoding="utf-8",
     )
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s %(levelname)s %(threadName)s %(message)s")
-    )
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(threadName)s %(message)s"))
     LOGGER.setLevel(logging.INFO)
     LOGGER.propagate = False
     for existing_handler in LOGGER.handlers[:]:
@@ -88,7 +100,7 @@ def _run_smoke_test(data_dir: Path | None) -> int:
     return 0
 
 
-def _run_gui(data_dir: Path | None) -> int:
+def _run_gui(data_dir: Path | None, *, mode: str = "auto") -> int:
     if sys.platform != "win32":
         raise DesktopRuntimeError("课石桌面版当前仅支持 Windows 10/11 64 位系统。")
 
@@ -104,17 +116,14 @@ def _run_gui(data_dir: Path | None) -> int:
 
     with SingleInstance():
         paths.validate_resources()
-        if not webview2_runtime_available():
-            raise DesktopRuntimeError(
-                "未检测到 Microsoft Edge WebView2 Runtime。\n\n"
-                "请安装 WebView2 Evergreen Runtime 后重新打开课石；Windows 10/11 通常已预装。"
-            )
         created = seed_user_database(paths)
         LOGGER.info("用户数据库就绪；首次创建=%s；路径=%s", created, paths.database_path)
         paths.configure_backend_environment()
 
         reserved = reserve_backend_socket()
         server = BackendServer(reserved)
+        session = BrowserSession()
+        server.browser_session = session
         try:
             health = server.start()
             LOGGER.info(
@@ -124,33 +133,101 @@ def _run_gui(data_dir: Path | None) -> int:
                 health,
             )
 
-            # Imported only in GUI mode. Diagnostics and CI never initialize a browser.
-            import webview
-
-            # pywebview disables downloads by default, including authenticated blob URLs.
-            # Enable its native Save As dialog before creating the desktop window.
-            webview.settings["ALLOW_DOWNLOADS"] = True
-            webview.create_window(
-                APP_TITLE,
-                server.url,
-                width=1240,
-                height=760,
-                min_size=(960, 640),
-                resizable=True,
-                text_select=True,
-                confirm_close=False,
-            )
-            webview.start(
-                gui="edgechromium",
-                debug=False,
-                private_mode=False,
-                storage_path=str(paths.webview_storage_path),
-                icon=str(paths.icon_path),
-            )
+            reason = None
+            if mode == "browser":
+                reason = "使用浏览器启动入口"
+            elif mode == "auto" and prefer_browser(paths):
+                reason = "沿用此前可用的浏览器兼容模式"
+            elif window_dependency_blocked(paths.resource_root):
+                reason = "桌面窗口组件带有互联网来源标记"
+            elif not webview2_runtime_available():
+                reason = "未检测到可用的WebView2运行时"
+            if reason:
+                run_browser_mode(paths, server, session, reason)
+            else:
+                try:
+                    _open_desktop_window(paths, server.url)
+                except Exception:
+                    LOGGER.exception("桌面窗口初始化失败，转为本机浏览器模式")
+                    run_browser_mode(paths, server, session, "桌面窗口初始化失败")
         finally:
             server.stop()
-            LOGGER.info("课石已安全退出")
+            LOGGER.info("课石本地服务已停止")
     return 0
+
+
+def _open_desktop_window(paths: RuntimePaths, url: str, *, check: bool = False) -> None:
+    import webview
+
+    webview.settings["ALLOW_DOWNLOADS"] = True
+    window = webview.create_window(
+        APP_TITLE,
+        url,
+        width=1240,
+        height=760,
+        min_size=(960, 640),
+        resizable=True,
+        text_select=True,
+        confirm_close=False,
+        hidden=check,
+    )
+    import threading
+    import time
+
+    state = {"ready": False, "failed": False, "user_closed": False}
+
+    def closing():
+        if not state["failed"] and not check:
+            state["user_closed"] = True
+
+    def expired():
+        if not state["ready"] and not state["user_closed"]:
+            state["failed"] = True
+            window.destroy()
+
+    def loaded():
+        if state["ready"] or state["user_closed"]:
+            return
+        deadline = time.monotonic() + 25
+        try:
+            while time.monotonic() < deadline and not state["user_closed"]:
+                status = window.evaluate_js(
+                    "({ready:window.keshiUiReady===true,failed:window.keshiUiFailed===true})"
+                )
+                if isinstance(status, dict) and status.get("failed"):
+                    break
+                if isinstance(status, dict) and status.get("ready"):
+                    state["ready"] = True
+                    timer.cancel()
+                    break
+                time.sleep(0.1)
+            if not state["ready"] and not state["user_closed"]:
+                state["failed"] = True
+        except Exception:
+            if not state["user_closed"]:
+                state["failed"] = True
+                LOGGER.exception("桌面页面初始化确认失败")
+        finally:
+            if check or state["failed"]:
+                window.destroy()
+
+    window.events.closing += closing
+    window.events.loaded += loaded
+    timer = threading.Timer(25, expired)
+    timer.daemon = True
+    timer.start()
+    try:
+        webview.start(
+            gui="edgechromium",
+            debug=False,
+            private_mode=False,
+            storage_path=str(paths.webview_storage_path),
+            icon=str(paths.icon_path),
+        )
+    finally:
+        timer.cancel()
+    if state["failed"] or (not state["ready"] and (check or not state["user_closed"])):
+        raise DesktopRuntimeError("桌面窗口未完成页面加载，改用本机浏览器模式")
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -160,12 +237,24 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"Keshi {APP_VERSION}")
         return 0
     try:
+        if arguments.check_ui:
+            from desktop.ui_check import run_ui_check
+
+            # WebView2 may finish profile writes briefly after its window is destroyed.
+            # Test runner can clean a remaining temporary profile after process exit.
+            with tempfile.TemporaryDirectory(
+                prefix="keshi-ui-check-", ignore_cleanup_errors=True
+            ) as directory:
+                result = run_ui_check(Path(directory), arguments.check_ui)
+            print(json.dumps(result, ensure_ascii=True))
+            return 0
         if arguments.smoke_test:
             return _run_smoke_test(arguments.data_dir)
-        return _run_gui(arguments.data_dir)
+        mode = "browser" if arguments.browser else "desktop" if arguments.desktop else "auto"
+        return _run_gui(arguments.data_dir, mode=mode)
     except DesktopRuntimeError as exc:
         LOGGER.error("启动失败：%s", exc)
-        if arguments.smoke_test:
+        if arguments.smoke_test or arguments.check_ui:
             print(
                 json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=True),
                 file=sys.stderr,
@@ -177,10 +266,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         details = "".join(traceback.format_exception(exc))
         LOGGER.critical("未处理异常\n%s", details)
         message = (
-            "课石遇到未预期的错误。请重新启动；若仍失败，请附上日志反馈。\n\n"
+            "课石未能完成启动。请确认完整解压安装包；不要关闭系统安全保护。\n"
+            "可尝试包内的“使用浏览器启动课石”入口。若仍失败，请提供日志：\n"
+            "%LOCALAPPDATA%\\Keshi\\logs\\desktop.log\n\n"
             f"错误：{exc}"
         )
-        if arguments.smoke_test:
+        if arguments.smoke_test or arguments.check_ui:
             print(
                 json.dumps({"status": "error", "error": str(exc)}, ensure_ascii=True),
                 file=sys.stderr,

@@ -30,14 +30,20 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 const weekdayNames = ["", "周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 const PLANNING_RESULT_LIMIT = 10;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener('beforeunload',event=>{
     if(state.token && state.draftRevision!==state.savedDraftRevision){event.preventDefault();event.returnValue='';}
   });
   bindEvents();
   initializeStepNavigation();
-  if (state.token) bootstrapApp();
+  if (state.token) await bootstrapApp();
   else showAuth();
+  setTimeout(()=>{
+    if(!window.keshiUiFailed){
+      window.keshiUiReady=true;
+      window.dispatchEvent(new Event('keshi-ui-ready'));
+    }
+  },0);
 });
 
 function bindEvents() {

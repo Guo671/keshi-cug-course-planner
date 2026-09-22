@@ -24,7 +24,7 @@ def main():
     const toast=(s)=>{document.title=s};
     const fetch=async()=>({ok:true,blob:async()=>new Blob([Uint8Array.from(atob(''' + repr(base64.b64encode(payload).decode()) + '''),c=>c.charCodeAt(0))],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})});
     ''' + handler + '</script>'
-    with tempfile.TemporaryDirectory(prefix='keshi-download-check-') as tmp:
+    with tempfile.TemporaryDirectory(prefix='keshi-download-check-', ignore_cleanup_errors=True) as tmp:
         output = Path(tmp) / 'saved.xlsx'
         webview.settings['ALLOW_DOWNLOADS'] = not args.disabled
         window = webview.create_window('Keshi isolated download test', html=html, hidden=True)
@@ -59,7 +59,7 @@ def main():
                 window.destroy()
 
         window.events.loaded += lambda: threading.Thread(target=exercise, daemon=True).start()
-        webview.start(gui='edgechromium', storage_path=str(Path(tmp)/'browser'))
+        webview.start(gui='edgechromium', private_mode=False, storage_path=str(Path(tmp)/'browser'))
         assert bool(results) is (not args.disabled), results
         print('PASS: downloads disabled reproduces silent failure' if args.disabled else 'PASS: real WebView2 saved exact XLSX bytes')
 

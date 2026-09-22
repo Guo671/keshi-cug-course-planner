@@ -1,6 +1,18 @@
-# 课石 0.3.5
+# 课石 0.3.6
 
 由果果开发，适用于不同学校的本地排课助手。由学生确定本学期想上的课程，课石读取完整教学班时间，按具体教学周检查冲突，生成候选课表。
+
+## 0.3.6 首次启动兼容
+
+完整解压后双击 `Keshi.exe`。优先使用原桌面窗口；检测到互联网标记阻止窗口组件、缺少WebView2或窗口初始化失败时，自动尝试本机Edge、Chrome，再尝试默认浏览器。页面确认加载后才报告成功。浏览器模式只访问本机127.0.0.1，不上传课表，不需要额外安装Python或.NET。
+
+- 直接使用浏览器：双击包内 `Start-in-browser.cmd`。兼容模式成功后，下次默认沿用；想重试桌面窗口，运行 `Try-desktop-window.cmd`。
+- 浏览器模式会保留一个“课石 · 本机浏览器模式”控制窗口，可重新打开页面或结束课石。关闭浏览器不会结束本地服务；结束前先确认草稿已保存。
+- 账号、总库、草稿、历史仍保存在 `%LOCALAPPDATA%\Keshi`。换浏览器可能需要重新登录原账号，不需要重新注册。此次升级不用恢复或删除总库。
+- 初次启动请等待，服务最多等待45秒；不要连续双击。没有浏览器或页面未确认加载时，控制窗口会显示本机地址和重试方法。
+- 本模式解决的是程序已经启动后的窗口依赖问题。若Windows在执行EXE之前就拦截它，本模式也无法自行运行；不会关闭SmartScreen、智能应用控制或杀毒，也不会自动解除文件来源标记。先确认下载来自本项目；需要Windows安全策略处理时请联系设备管理者。不要从陌生站点下载DLL。
+
+支持目标为Windows 10/11 x64；发布验证使用Windows 11与当前安装的Edge、Chrome。ARM、精简系统、组织强制安全策略等环境未承诺全面兼容。证书签名仍未提供。
 
 ## 0.3.5 保存与退出保护
 
@@ -24,7 +36,10 @@
 
 ## 使用便携版
 
-从 [GitHub Releases 下载课石 0.3.5](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.5)，完整解压 `keshi-v0.3.5-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位及 Edge WebView2 Runtime；不需要安装 Python。
+[下载图文使用说明 PDF](https://github.com/Guo671/keshi-cug-course-planner/releases/download/v0.3.6/keshi-guide-v0.3.6.pdf) · [可编辑 DOCX](https://github.com/Guo671/keshi-cug-course-planner/releases/download/v0.3.6/keshi-guide-v0.3.6.docx)
+
+
+从 [GitHub Releases 下载课石 0.3.6](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.6)，完整解压 `keshi-v0.3.6-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位。原桌面窗口使用WebView2；兼容模式使用已安装的Edge或Chrome。不需要安装Python。
 
 本地账户与学校统一认证账户无关。数据保存在 `%LOCALAPPDATA%\Keshi`，升级客户端会继续使用这里的账号、草稿和历史方案。旧用户首次升级后，在“课程总库管理”点击“恢复本版本内置总库”，即可使用新版课程数据；也可以自行导入新总库。删除总库只删除课程目录，不删除账号和历史。
 

@@ -18,8 +18,17 @@ def test_launcher_enables_downloads_before_window_creation(monkeypatch, tmp_path
     server = Mock(url='http://127.0.0.1:12345')
     monkeypatch.setattr(launcher, 'BackendServer', lambda _: server)
     view = SimpleNamespace(settings={'ALLOW_DOWNLOADS': False}, start=Mock())
+    class Event:
+        def __init__(self): self.callbacks=[]
+        def __iadd__(self, callback): self.callbacks.append(callback); return self
+    window=SimpleNamespace(events=SimpleNamespace(loaded=Event(),closing=Event()),
+                           evaluate_js=Mock(return_value={'ready':True,'failed':False}),
+                           destroy=Mock())
+    view.start.side_effect=lambda **kwargs:[callback() for callback in window.events.loaded.callbacks]
+    monkeypatch.setattr(launcher,'run_browser_mode',Mock(side_effect=AssertionError('unexpected fallback')))
     def create_window(*args, **kwargs):
         assert view.settings['ALLOW_DOWNLOADS'] is True
+        return window
     view.create_window = Mock(side_effect=create_window)
     monkeypatch.setitem(launcher.sys.modules, 'webview', view)
     monkeypatch.setattr(launcher.sys, 'platform', 'win32')
