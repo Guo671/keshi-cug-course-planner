@@ -1,6 +1,12 @@
-# 课石 0.3.6
+# 课石 0.3.7
 
 由果果开发，适用于不同学校的本地排课助手。由学生确定本学期想上的课程，课石读取完整教学班时间，按具体教学周检查冲突，生成候选课表。
+
+## 0.3.7 本地账号恢复
+
+登录后可在“账号设置”修改密码或更换离线恢复码；忘记密码时用提前保存的恢复码重置，无需邮箱、网络或身份认证。新注册及旧账号升级后首次登录会显示一次恢复码，请保存。密码重置会撤销旧会话、轮换恢复码，保留档案、草稿和历史。密码与恢复码均遗失时无法自动恢复；不保存明文密码或提供开发者万能密码。修复事务提交晚于响应导致的偶发登录失效；本机启动就绪检查不再依赖系统代理或HTTPS初始化。
+
+下方图文说明仍为0.3.6，账号恢复以软件内置0.3.7说明为准。
 
 ## 0.3.6 首次启动兼容
 
@@ -39,7 +45,7 @@
 [下载图文使用说明 PDF](https://github.com/Guo671/keshi-cug-course-planner/releases/download/v0.3.6/keshi-guide-v0.3.6.pdf) · [可编辑 DOCX](https://github.com/Guo671/keshi-cug-course-planner/releases/download/v0.3.6/keshi-guide-v0.3.6.docx)
 
 
-从 [GitHub Releases 下载课石 0.3.6](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.6)，完整解压 `keshi-v0.3.6-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位。原桌面窗口使用WebView2；兼容模式使用已安装的Edge或Chrome。不需要安装Python。
+从 [GitHub Releases 下载课石 0.3.7](https://github.com/Guo671/keshi-cug-course-planner/releases/tag/v0.3.7)，完整解压 `keshi-v0.3.7-win64.zip`，双击文件夹内的 `Keshi.exe`。需要 Windows 10/11 64 位。原桌面窗口使用WebView2；兼容模式使用已安装的Edge或Chrome。不需要安装Python。
 
 本地账户与学校统一认证账户无关。数据保存在 `%LOCALAPPDATA%\Keshi`，升级客户端会继续使用这里的账号、草稿和历史方案。旧用户首次升级后，在“课程总库管理”点击“恢复本版本内置总库”，即可使用新版课程数据；也可以自行导入新总库。删除总库只删除课程目录，不删除账号和历史。
 

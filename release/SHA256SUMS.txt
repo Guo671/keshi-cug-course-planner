@@ -1,1 +1,1 @@
-d0fca130eccaaa68cfcef3f29f89fbe07460a31f0693dd3f11f14b9f53eab4bf  keshi-v0.3.6-win64.zip
+6d4c3a6ec56942e27021da3c5f0a058727373c81aade6b9ec67e8125f224dd6b  keshi-v0.3.7-win64.zip

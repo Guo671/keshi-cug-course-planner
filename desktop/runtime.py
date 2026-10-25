@@ -11,8 +11,6 @@ import sys
 import tempfile
 import threading
 import time
-import urllib.error
-import urllib.request
 from contextlib import closing, suppress
 from dataclasses import dataclass
 from pathlib import Path
@@ -89,6 +87,7 @@ class RuntimePaths:
             self.static_dir / "app.js",
             self.static_dir / "course-editor.js",
             self.static_dir / "memory-actions.js",
+            self.static_dir / "account-settings.js",
             self.static_dir / "browser-compat.js",
             self.static_dir / "help.html",
             self.static_dir / "styles.css",
@@ -267,18 +266,21 @@ class BackendServer:
         self._thread = threading.Thread(target=self._serve, name="keshi-backend", daemon=True)
         self._thread.start()
         deadline = time.monotonic() + timeout_seconds
-        health_url = f"{self.url}/api/health"
+        # Loopback health checks must not depend on system/browser proxy rules.
+        from http.client import HTTPConnection, HTTPException
         while time.monotonic() < deadline:
             if self._failure is not None:
                 raise DesktopRuntimeError(f"本地服务启动失败：{self._failure}") from self._failure
             if self._thread is not None and not self._thread.is_alive():
                 raise DesktopRuntimeError("本地服务在启动完成前意外退出。")
             try:
-                with urllib.request.urlopen(health_url, timeout=0.75) as response:
+                with closing(HTTPConnection("127.0.0.1", self.port, timeout=0.75)) as connection:
+                    connection.request("GET", "/api/health")
+                    response = connection.getresponse()
                     payload = json.loads(response.read().decode("utf-8"))
                 if response.status == 200 and payload.get("status") == "ok":
                     return {str(key): str(value) for key, value in payload.items()}
-            except (OSError, urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            except (OSError, HTTPException, TimeoutError, json.JSONDecodeError):
                 time.sleep(0.08)
         raise DesktopRuntimeError(
             "本地服务在45秒内未就绪。首次启动可能受磁盘或安全扫描影响。"

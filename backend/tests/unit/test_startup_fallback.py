@@ -96,7 +96,8 @@ def test_cold_start_health_at_25_seconds_is_not_prematurely_aborted(monkeypatch)
     monkeypatch.setattr(runtime.threading,'Thread',lambda **_:thread)
     def request(*args,**kwargs):
         if clock[0]<25:raise OSError('cold startup')
-        return nullcontext(SimpleNamespace(status=200,read=lambda:b'{"status":"ok"}'))
-    monkeypatch.setattr(runtime.urllib.request,'urlopen',request)
+        return SimpleNamespace(status=200,read=lambda:b'{"status":"ok"}')
+    import http.client
+    monkeypatch.setattr(http.client,'HTTPConnection',lambda *args,**kwargs: SimpleNamespace(request=lambda *args: None,getresponse=request,close=lambda: None))
     server=runtime.BackendServer(Mock(port=12345))
     assert server.start()=={'status':'ok'}

@@ -20,7 +20,7 @@ class RequestLimitsMiddleware:
         self.app = app
         self.general = BoundedSemaphore(16)
         self.heavy = BoundedSemaphore(1)
-        self.auth = BoundedSemaphore(2)
+        self.auth = BoundedSemaphore(1)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http" or not scope.get("path", "").startswith("/api/"):
@@ -60,7 +60,13 @@ class RequestLimitsMiddleware:
             "/api/catalog/restore-builtin",
         } or (path == "/api/catalog" and scope["method"] == "DELETE"):
             gates.append(self.heavy)
-        if path in {"/api/auth/register", "/api/auth/login"}:
+        if path in {
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/change-password",
+            "/api/auth/recovery-code",
+            "/api/auth/reset-password",
+        }:
             gates.append(self.auth)
         acquired = []
         try:

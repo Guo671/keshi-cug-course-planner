@@ -14,6 +14,7 @@
     <script src="/app.js" defer></script>
     <script src="/course-editor.js" defer></script>
     <script src="/memory-actions.js" defer></script>
+    <script src="/account-settings.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -65,6 +66,8 @@
           <button id="auth-submit" class="button primary wide" type="submit">登录</button>
           <p id="auth-error" class="form-error" role="alert"></p>
         </form>
+        <button id="forgot-password" class="text-button" type="button">忘记密码？使用恢复码</button>
+        <p class="form-hint">密码只用于本机课石。离线恢复不需要邮箱；恢复码请自行妥善保存。</p>
       </section>
     </div>
 
@@ -78,6 +81,7 @@
         <nav aria-label="账户导航">
           <button class="button ghost small-button" type="button" data-open-help>使用说明</button>
           <span id="current-user" class="current-user"></span>
+          <button id="open-account-settings" class="button ghost small-button" type="button">账号设置</button>
           <button id="logout-button" class="button ghost small-button" type="button">退出</button>
         </nav>
       </header>
@@ -329,6 +333,49 @@
       <div class="inline-actions editor-footer"><button id="add-custom-section" type="button" class="button secondary">添加备选教学班</button><button type="submit" class="button primary">保存课程</button></div>
       <p id="custom-error" class="form-error" role="alert"></p>
     </form></dialog>
+    <dialog id="account-settings" class="account-dialog" aria-labelledby="account-settings-title">
+      <div class="panel-title-row"><h2 id="account-settings-title">账号设置</h2><button id="close-account-settings" class="text-button" type="button">关闭</button></div>
+      <p id="account-recovery-status" class="muted"></p>
+      <form id="change-password-form" class="stack-form">
+        <h3>修改密码</h3>
+        <label>当前密码<input id="change-current-password" type="password" autocomplete="current-password" maxlength="256" required /></label>
+        <label>新密码（至少10个字符）<input id="change-new-password" type="password" autocomplete="new-password" minlength="10" maxlength="256" required /></label>
+        <label>再次输入新密码<input id="change-confirm-password" type="password" autocomplete="new-password" minlength="10" maxlength="256" required /></label>
+        <p class="form-hint">课表、草稿和历史保留。修改后需要重新登录，现有恢复码仍然有效。</p>
+        <button type="submit" class="button primary">修改密码并重新登录</button>
+        <p id="change-password-error" class="form-error" role="alert"></p>
+      </form>
+      <form id="generate-recovery-form" class="stack-form account-subsection">
+        <h3>生成或更换恢复码</h3>
+        <p>忘记密码时，用恢复码设置新密码。生成新码后旧码立即失效；我们不能查看或重新显示旧码。</p>
+        <label>验证当前密码<input id="recovery-current-password" type="password" autocomplete="current-password" maxlength="256" required /></label>
+        <button type="submit" class="button secondary">生成新的恢复码</button>
+        <p id="generate-recovery-error" class="form-error" role="alert"></p>
+      </form>
+    </dialog>
+    <dialog id="reset-password-dialog" class="account-dialog" aria-labelledby="reset-password-title">
+      <div class="panel-title-row"><h2 id="reset-password-title">用恢复码重置密码</h2><button id="close-reset-password" class="text-button" type="button">取消</button></div>
+      <p>无需邮箱或网络。只能恢复本机已有账号；恢复后课表数据保留，旧登录和旧恢复码失效。</p>
+      <form id="reset-password-form" class="stack-form">
+        <label>用户名<input id="reset-username" autocomplete="username" minlength="3" maxlength="64" required /></label>
+        <label>恢复码<input id="reset-recovery-code" autocomplete="off" spellcheck="false" maxlength="256" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" required /></label>
+        <label>新密码（至少10个字符）<input id="reset-new-password" type="password" autocomplete="new-password" minlength="10" maxlength="256" required /></label>
+        <label>再次输入新密码<input id="reset-confirm-password" type="password" autocomplete="new-password" minlength="10" maxlength="256" required /></label>
+        <button type="submit" class="button primary">重置密码并生成新恢复码</button>
+        <p id="reset-password-error" class="form-error" role="alert"></p>
+      </form>
+      <p class="form-hint">旧版账号需先成功登录一次，才能取得恢复码。如果密码和恢复码都丢失，暂不能自助恢复；请保留原数据，不要删号或删除数据库。</p>
+    </dialog>
+    <dialog id="recovery-code-dialog" class="account-dialog" aria-labelledby="recovery-code-title">
+      <h2 id="recovery-code-title">请保存你的账号恢复码</h2>
+      <p id="recovery-code-account"></p>
+      <p>恢复码仅在此展示一次。它可以重置密码，等同于账号钥匙，请勿发给他人或上传公开仓库。</p>
+      <label>恢复码<textarea id="recovery-code-value" rows="2" readonly autocomplete="off" spellcheck="false"></textarea></label>
+      <div class="inline-actions"><button id="copy-recovery-code" class="button secondary" type="button">复制恢复码</button><button id="download-recovery-code" class="button secondary" type="button">保存恢复文件</button></div>
+      <p class="form-hint">可保存到自己的密码管理器或安全位置。恢复码与原数据库配套，不是云账号；使用后请保存新码。</p>
+      <label class="toggle-row"><input id="recovery-code-saved" type="checkbox" /><span>我已在安全位置保存恢复码</span></label>
+      <button id="finish-recovery-code" class="button primary wide" type="button" disabled>已保存，继续</button>
+    </dialog>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </body>
 </html>

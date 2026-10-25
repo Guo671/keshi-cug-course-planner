@@ -11,6 +11,7 @@ from contextlib import closing
 from pathlib import Path
 
 PRIVATE_TABLES = (
+    "account_recovery",
     "users",
     "login_sessions",
     "student_profiles",

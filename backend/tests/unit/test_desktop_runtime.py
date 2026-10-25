@@ -81,9 +81,7 @@ def test_first_run_seed_is_atomic_and_never_overwrites_user_database(tmp_path: P
         connection.execute("CREATE TABLE user_sentinel (value TEXT NOT NULL)")
         connection.execute("INSERT INTO user_sentinel VALUES ('keep-me')")
     with sqlite3.connect(seed_path) as connection:
-        connection.execute(
-            "INSERT INTO catalog_courses (id, course_code) VALUES (2, 'NEW-SEED')"
-        )
+        connection.execute("INSERT INTO catalog_courses (id, course_code) VALUES (2, 'NEW-SEED')")
 
     assert seed_user_database(paths) is False
     with sqlite3.connect(paths.database_path) as connection:
@@ -146,3 +144,35 @@ def test_windows_named_mutex_rejects_second_instance() -> None:
     finally:
         second.release()
         first.release()
+
+
+def test_backend_health_ignores_broken_system_proxy(monkeypatch):
+    import urllib.request
+    from desktop.runtime import BackendServer
+
+    reserved = reserve_backend_socket(preferred_port=0)
+    reserved.port = reserved.socket.getsockname()[1]
+    server = BackendServer(reserved)
+    monkeypatch.setattr(urllib.request, "getproxies", lambda: {"http": "http://127.0.0.1:1"})
+    monkeypatch.setattr(urllib.request, "proxy_bypass", lambda host: False)
+
+    def serve_health():
+        reserved.socket.settimeout(3)
+        try:
+            connection, _ = reserved.socket.accept()
+            with connection:
+                connection.recv(4096)
+                body = b'{"status":"ok"}'
+                connection.sendall(
+                    b"HTTP/1.1 200 OK\r\nContent-Length: 15\r\nConnection: close\r\n\r\n" + body
+                )
+        except TimeoutError:
+            pass
+
+    monkeypatch.setattr(server, "_serve", serve_health)
+    try:
+        assert server.start(timeout_seconds=2)["status"] == "ok"
+    finally:
+        if server._thread:
+            server._thread.join(4)
+        reserved.close()

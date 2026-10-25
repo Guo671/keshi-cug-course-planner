@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cug-course-planner"
-version = "0.3.6"
+version = "0.3.7"
 description = "由果果开发的通用本地排课助手"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "alembic>=1.14,<2",
   "argon2-cffi>=23.1,<26",
-  "fastapi>=0.115,<1",
+  "fastapi>=0.141.1,<1",
   "orjson>=3.10,<4",
   "ortools>=9.12,<10",
   "pydantic-settings>=2.7,<3",

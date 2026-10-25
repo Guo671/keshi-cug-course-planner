@@ -4,6 +4,7 @@ const state = {
   token: localStorage.getItem("cugPlannerToken"),
   authMode: "login",
   profile: null,
+  account: null,
   catalog: null,
   inputMode: "manual",
   selectedCourses: new Map(),
@@ -153,6 +154,7 @@ async function submitAuth(event) {
   button.disabled = true;
   $("#auth-error").textContent = "";
   try {
+    const username = $("#auth-username").value;
     const result = await api(`/api/auth/${state.authMode}`, {
       method: "POST",
       body: JSON.stringify({ username: $("#auth-username").value, password: $("#auth-password").value }),
@@ -161,6 +163,7 @@ async function submitAuth(event) {
     state.token = result.access_token;
     localStorage.setItem("cugPlannerToken", state.token);
     await bootstrapApp();
+    if(result.recovery_code && state.token)showRecoveryCode(result.recovery_code,state.account?.username || username);
   } catch (error) {
     if (error.staleSession) return;
     $("#auth-error").textContent = error.message;
@@ -172,6 +175,7 @@ async function submitAuth(event) {
 async function bootstrapApp() {
   try {
     const me = await api("/api/auth/me");
+    state.account=me;updateAccountUi(me);
     $("#current-user").textContent = me.username;
     await Promise.all([loadProfile(), loadCatalogStatus()]);
     await Promise.all([restorePlanningDraft(), loadPlanningHistory()]);
@@ -217,6 +221,8 @@ function clearSession() {
 }
 
 function resetUserState() {
+  if(typeof clearAccountUi==='function')clearAccountUi();
+  state.account=null;
   state.searchRequestId++;
   state.resultRequestId++;
   $("#generate-plan").disabled = false;

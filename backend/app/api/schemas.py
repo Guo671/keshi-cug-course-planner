@@ -41,12 +41,32 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: Literal["bearer"] = "bearer"
     expires_at: datetime
+    recovery_code: str | None = None
+
+
+class CurrentPasswordRequest(BaseModel):
+    current_password: SecretStr = Field(min_length=1, max_length=256)
+
+
+class ChangePasswordRequest(CurrentPasswordRequest):
+    new_password: SecretStr = Field(min_length=10, max_length=256)
+
+
+class ResetPasswordRequest(BaseModel):
+    username: Username
+    recovery_code: SecretStr = Field(min_length=1, max_length=256)
+    new_password: SecretStr = Field(min_length=10, max_length=256)
+
+
+class RecoveryCodeResponse(BaseModel):
+    recovery_code: str
 
 
 class UserResponse(BaseModel):
     id: int
     username: str
     profile_complete: bool
+    recovery_enabled: bool = False
 
 
 class StudentProfileInput(BaseModel):

@@ -12,7 +12,9 @@ from ..infrastructure.database import get_session
 from ..infrastructure.security import get_user_for_token
 from ..infrastructure.tables import User
 
-Database = Annotated[Session, Depends(get_session)]
+# Commit before sending success: a browser may immediately use a newly issued
+# token on another connection, which cannot see an uncommitted login session.
+Database = Annotated[Session, Depends(get_session, scope="function")]
 _bearer = HTTPBearer(auto_error=False)
 
 

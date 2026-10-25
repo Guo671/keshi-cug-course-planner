@@ -8,12 +8,12 @@ from pathlib import Path
 from zipfile import ZipFile
 
 ROOT=Path(__file__).resolve().parents[1]
-OUTPUT=ROOT/'tmp/startup-036'
+OUTPUT=ROOT/'tmp/startup-037'
 OUTPUT.mkdir(parents=True,exist_ok=True)
 checks=[]
 with tempfile.TemporaryDirectory(prefix='课石 中文路径 !!! ',dir=OUTPUT) as directory:
     folder=Path(directory).resolve()
-    with ZipFile(ROOT/'release/keshi-v0.3.6-win64.zip') as archive:
+    with ZipFile(ROOT/'release/keshi-v0.3.7-win64.zip') as archive:
         for name in archive.namelist():
             assert (folder/name).resolve().is_relative_to(folder)
         archive.extractall(folder)

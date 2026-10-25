@@ -42,6 +42,18 @@ class LoginSession(Base):
     user: Mapped[User] = relationship(back_populates="sessions")
 
 
+class AccountRecovery(Base):
+    """Only a hash of the offline recovery code; old user rows need no alteration."""
+
+    __tablename__ = "account_recovery"
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    recovery_hash: Mapped[str] = mapped_column(String(64))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
 class StudentProfile(Base):
     __tablename__ = "student_profiles"
 

@@ -4,8 +4,8 @@
 :root{font-family:"Microsoft YaHei UI","Microsoft YaHei",sans-serif;color:#263b35;background:#fffefa;line-height:1.85}*{box-sizing:border-box}body{max-width:1000px;margin:auto;padding:24px 30px 60px}h1,h2,h3{line-height:1.4}h1{color:#20594d;margin:0 0 12px}h2{margin:36px 0 14px;padding-top:14px;border-top:1px solid #d8e5df;color:#20594d}h3{margin-bottom:8px;font-size:17px}p{margin:10px 0}nav{display:flex;gap:10px;flex-wrap:wrap;padding:18px;background:#edf5f8;border-radius:14px}nav a{background:white;padding:6px 12px;border-radius:8px;color:#246584;text-decoration:none;border:1px solid #d4e6ed}a:focus-visible{outline:3px solid #528bc2}table{border-collapse:collapse;width:100%;margin:16px 0}th,td{padding:10px 12px;border:1px solid #d6e0da;text-align:left;vertical-align:top}th{background:#eaf2ed;color:#20594d}.table-wrap{overflow:auto}.note{background:#f0f7f9;border-left:4px solid #68a8c1;padding:13px 18px;margin:18px 0;border-radius:8px}code{overflow-wrap:anywhere;background:#f0f1ed;padding:2px 5px;border-radius:4px}li{margin:7px 0}small{color:#596e64}@media(max-width:540px){body{padding:18px 16px 40px;font-size:14px}h1{font-size:25px}h2{font-size:21px}th,td{padding:8px}nav{padding:12px;gap:8px}}@media print{nav{display:none}body{max-width:none;padding:0}h2{break-after:avoid}}
 </style></head><body>
 <h1>课石使用说明</h1><p><strong>由果果开发 · 适用于不同学校的本地排课工具</strong></p>
-<p><strong>适用版本：0.3.6 · 说明更新：2026年9月22日</strong></p>
-<div class="note"><strong>0.3.6新增：</strong>桌面窗口失败时使用本机Edge/Chrome兼容模式。已成功使用兼容模式后，下次默认沿用。<br><strong>0.3.5新增：</strong>退出账号前等待未保存草稿落盘；失败时可取消退出或明确放弃修改。保存状态区分旧响应和更新的修改。<br><strong>0.3.4新增：</strong>草稿立即保存、删除草稿、删除单条或全部历史。删除有确认并按当前账号隔离。<br><strong>此前修复：</strong>0.3.3 修复连续点击不同课程修改入口时，慢响应覆盖新编辑窗口的问题。<br><strong>此前修复：</strong>0.3.2 已修复桌面版“下载标准 Excel 模板”点击无反应的问题。点击后应弹出保存文件对话框，选择位置并保存。只更新 GitHub 下载包不会自动更新电脑中已经安装的旧版；升级时需要完整解压新版并启动新版程序。</div>
+<p><strong>适用版本：0.3.7 · 说明更新：2026年10月25日</strong></p>
+<div class="note"><strong>0.3.7新增：</strong>账号设置支持修改密码和生成离线恢复码，登录页支持用恢复码重置密码；修复登录成功后偶发提示未登录的问题；本机启动检查不再依赖代理或HTTPS初始化。<br><strong>0.3.6新增：</strong>桌面窗口失败时使用本机Edge/Chrome兼容模式。已成功使用兼容模式后，下次默认沿用。<br><strong>0.3.5新增：</strong>退出账号前等待未保存草稿落盘；失败时可取消退出或明确放弃修改。保存状态区分旧响应和更新的修改。<br><strong>0.3.4新增：</strong>草稿立即保存、删除草稿、删除单条或全部历史。删除有确认并按当前账号隔离。<br><strong>此前修复：</strong>0.3.3 修复连续点击不同课程修改入口时，慢响应覆盖新编辑窗口的问题。<br><strong>此前修复：</strong>0.3.2 已修复桌面版“下载标准 Excel 模板”点击无反应的问题。点击后应弹出保存文件对话框，选择位置并保存。只更新 GitHub 下载包不会自动更新电脑中已经安装的旧版；升级时需要完整解压新版并启动新版程序。</div>
 <p>本说明随软件保存在电脑中，断网也能打开。课石帮助你在已经确定要修读的课程之间选择教学班、核对时间并生成候选课表。正式选课仍须在学校教务系统完成。</p>
 <nav aria-label="说明目录"><a href="#quick">快速开始</a><a href="#accounts">账号与离线使用</a><a href="#catalog">课程总库</a><a href="#import">Excel 导入</a><a href="#manual">手动编辑</a><a href="#preferences">排课偏好</a><a href="#results">查看结果</a><a href="#leave">请假与删课建议</a><a href="#storage">保存与升级</a><a href="#questions">常见问题</a></nav>
 <h2 id="quick">一、第一次使用</h2>
@@ -13,8 +13,8 @@
 <div class="note">不需要使用培养方案导入，也不需要填写开发者接口令牌。课石不支持 PDF 课表导入。</div>
 <h2 id="accounts">二、账号与断网使用</h2>
 <p><strong>账号保存在本机，不是互联网账号。</strong>默认在同一 Windows 用户下使用同一份课石数据库；不同电脑、不同 Windows 用户或指定的不同数据目录之间不会自动同步。</p>
-<ul><li>同一台电脑可以注册多个课石账号，退出后登录另一个本地账号。只在别的电脑注册过的账号，不能自动在这里登录。</li><li>同一份数据库不允许重复用户名。用户名会去除首尾空格、统一大小写和全角形式，因此 <code>Alice</code> 与 <code>alice</code> 视为同名；姓名相同的同学可添加班级或数字区分。</li><li>不同用户名可以使用相同密码，不会覆盖或串号。密码以带随机盐的散列保存，不以明文保存。当前版本没有邮箱找回密码功能。</li><li>个人档案、待排草稿和历史方案按账号分开。<strong>课程总库是本机共享资料：</strong>任一账号删除或替换总库，会影响这份数据库中的其他账号可搜索的课程，但不会删除其他人的个人记录。</li><li>总库导入完成后，登录、搜索、手动编辑、生成方案、查看历史和本说明均可断网使用。新课表的获取、学校教务系统选课可能需要网络。</li></ul>
-<h2 id="catalog">三、课程总库与待排课程的区别</h2>
+<ul><li>同一台电脑可以注册多个课石账号，退出后登录另一个本地账号。只在别的电脑注册过的账号，不能自动在这里登录。</li><li>同一份数据库不允许重复用户名。用户名会去除首尾空格、统一大小写和全角形式，因此 <code>Alice</code> 与 <code>alice</code> 视为同名；姓名相同的同学可添加班级或数字区分。</li><li>不同用户名可以使用相同密码，不会覆盖或串号。密码以带随机盐的散列保存，不以明文保存。忘记密码可使用提前保存的离线恢复码，无需邮箱或网络。</li><li>个人档案、待排草稿和历史方案按账号分开。<strong>课程总库是本机共享资料：</strong>任一账号删除或替换总库，会影响这份数据库中的其他账号可搜索的课程，但不会删除其他人的个人记录。</li><li>总库导入完成后，登录、搜索、手动编辑、生成方案、查看历史和本说明均可断网使用。新课表的获取、学校教务系统选课可能需要网络。</li></ul>
+<h3>修改密码与忘记密码</h3><ol><li>新注册或旧账号升级后首次登录，会显示一次恢复码。请复制或下载保存到安全位置，再勾选已保存。恢复码相当于重置密码的钥匙，不要发给别人。</li><li>登录后点击顶部“账号设置”，输入当前密码和两次新密码即可修改；修改成功会退出所有登录，课表、草稿和历史不删除。</li><li>忘记密码时，在登录页点“忘记密码”，填写用户名、恢复码和两次新密码。成功后必须保存新恢复码，旧码立即失效，然后用新密码登录。</li><li>恢复码遗失但还记得密码时，可在账号设置验证当前密码并生成新码。旧账号尚未领取过恢复码时，需要先成功登录一次。</li><li>密码和恢复码都遗失时，软件不能自动找回。开发者没有查看原密码的后台。恢复文件不是账号数据备份，迁移电脑仍需完整备份数据目录。</li></ol><h2 id="catalog">三、课程总库与待排课程的区别</h2>
 <p>本版本内置总库属于<strong>中国地质大学（武汉）2026年秋季</strong>，不是其他学校的课程资料。其他学校用户请导入自己的总库或标准模板，也可自行填写课程；不必使用内置总库。</p>
 <p><strong>总库</strong>是供搜索的大范围课程目录；<strong>待排课程</strong>是你本学期实际想上的课。导入全校一千多门课程不会把它们全部加入个人排课。</p>
 <p>打开“课程总库管理”，一次选择同一学期的 1—5 个 ZIP。ZIP 内可有子文件夹，读取其中的 XLS／XLSX。每个工作簿应是一门课程的完整课表。检查完成后，整批文件合并为一个新总库并替换旧库。</p>
@@ -72,5 +72,5 @@
 <h3>没有结果，是不是课程一定排不开？</h3><p>先区分“已证明无解”和“时限内未找到结果”。检查时间输入、全部候选被排除、必须课程、锁定班、未知时间和教师限制。规模过大时先减少不需要的教学班或分批核对。</p>
 <h3>导入后少了课程怎么办？</h3><p>查看导入计数和未读取文件说明。表格文件数、课程数和教学班数不是同一个概念；同课号可能合并。失败文件应修正或使用标准模板补录，不要凭“导入成功”猜测全部资料都已正确识别。</p>
 <h3>如何报告问题？</h3><p>记录软件版本、操作步骤、错误原文、课程号与教学班号。可提供脱敏后的最小课表文件，说明期望结果和实际结果。不要发送密码或完整个人数据库。</p>
-<small>本说明针对课石 0.3.6，更新于2026年9月22日。软件是排课辅助工具，测试通过不代表所有未来文件和所有操作组合都已穷尽。</small>
+<small>本说明针对课石 0.3.7，更新于2026年10月25日。软件是排课辅助工具，测试通过不代表所有未来文件和所有操作组合都已穷尽。</small>
 </body></html>
